@@ -1,0 +1,2 @@
+Suggested destination for the dashboard's SVG, PNG and PDF exports.
+Nothing is written here automatically — pick this folder in the export dialog.

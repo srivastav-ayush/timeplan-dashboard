@@ -1,0 +1,512 @@
+{
+  "version": 1,
+  "id": "2026-07",
+  "label": "July 2026",
+  "created": "2026-07-01T08:00:00.000Z",
+  "plans": {
+    "l1_programme": {
+      "file": "L1_Programme.xlsx",
+      "key": "L1_Programme",
+      "name": "Programme",
+      "acts": {
+        "1": {
+          "n": "Programme kickoff",
+          "sw": 3,
+          "sy": 2026,
+          "ew": 6,
+          "ey": 2026
+        },
+        "2": {
+          "n": "Concept freeze",
+          "sw": 10,
+          "sy": 2026,
+          "ew": 14,
+          "ey": 2026
+        },
+        "3": {
+          "n": "Design gate G2",
+          "sw": 20,
+          "sy": 2026,
+          "ew": 22,
+          "ey": 2026
+        },
+        "4": {
+          "n": "Pilot build authorisation",
+          "sw": 34,
+          "sy": 2026,
+          "ew": 35,
+          "ey": 2026
+        },
+        "5": {
+          "n": "Start of production",
+          "sw": 6,
+          "sy": 2027,
+          "ew": 10,
+          "ey": 2027
+        }
+      }
+    },
+    "l2_powertrain": {
+      "file": "L2_Powertrain.xlsx",
+      "key": "L2_Powertrain",
+      "name": "Powertrain",
+      "acts": {
+        "1": {
+          "n": "Engine variant lock",
+          "sw": 9,
+          "sy": 2026,
+          "ew": 13,
+          "ey": 2026
+        },
+        "2": {
+          "n": "Transmission sourcing",
+          "sw": 14,
+          "sy": 2026,
+          "ew": 19,
+          "ey": 2026
+        },
+        "3": {
+          "n": "Cooling package test",
+          "sw": 21,
+          "sy": 2026,
+          "ew": 27,
+          "ey": 2026
+        },
+        "4": {
+          "n": "Calibration release",
+          "sw": 30,
+          "sy": 2026,
+          "ew": 32,
+          "ey": 2026
+        },
+        "5": {
+          "n": "Powertrain readiness gate",
+          "sw": 44,
+          "sy": 2026,
+          "ew": 50,
+          "ey": 2026
+        }
+      }
+    },
+    "l2_bodyshop": {
+      "file": "L2_Bodyshop.xlsx",
+      "key": "L2_Bodyshop",
+      "name": "Bodyshop",
+      "acts": {
+        "1": {
+          "n": "Bodyshop layout study",
+          "sw": 8,
+          "sy": 2026,
+          "ew": 12,
+          "ey": 2026
+        },
+        "2": {
+          "n": "Weld line specification",
+          "sw": 13,
+          "sy": 2026,
+          "ew": 18,
+          "ey": 2026
+        },
+        "3": {
+          "n": "Fixture design release",
+          "sw": 19,
+          "sy": 2026,
+          "ew": 23,
+          "ey": 2026
+        },
+        "4": {
+          "n": "Bodyshop trial run",
+          "sw": 28,
+          "sy": 2026,
+          "ew": 33,
+          "ey": 2026
+        },
+        "5": {
+          "n": "Bodyshop sign-off",
+          "sw": 40,
+          "sy": 2026,
+          "ew": 44,
+          "ey": 2026
+        }
+      }
+    },
+    "l3_electronics": {
+      "file": "L3_Electronics.xlsx",
+      "key": "L3_Electronics",
+      "name": "Electronics",
+      "acts": {
+        "1": {
+          "n": "ECU hardware freeze",
+          "sw": 11,
+          "sy": 2026,
+          "ew": 16,
+          "ey": 2026
+        },
+        "2": {
+          "n": "Harness routing",
+          "sw": 16,
+          "sy": 2026,
+          "ew": 21,
+          "ey": 2026
+        },
+        "3": {
+          "n": "Software integration",
+          "sw": 22,
+          "sy": 2026,
+          "ew": 29,
+          "ey": 2026
+        },
+        "4": {
+          "n": "EMC validation",
+          "sw": 30,
+          "sy": 2026,
+          "ew": 30,
+          "ey": 2026
+        },
+        "5": {
+          "n": "Electronics release",
+          "sw": 37,
+          "sy": 2026,
+          "ew": 41,
+          "ey": 2026
+        }
+      }
+    },
+    "l3_castings": {
+      "file": "L3_Castings.xlsx",
+      "key": "L3_Castings",
+      "name": "Castings",
+      "acts": {
+        "1": {
+          "n": "Alloy selection",
+          "sw": 10,
+          "sy": 2026,
+          "ew": 13,
+          "ey": 2026
+        },
+        "2": {
+          "n": "Pattern manufacture",
+          "sw": 14,
+          "sy": 2026,
+          "ew": 16,
+          "ey": 2026
+        },
+        "3": {
+          "n": "First article casting",
+          "sw": 20,
+          "sy": 2026,
+          "ew": 24,
+          "ey": 2026
+        },
+        "4": {
+          "n": "Casting capability run",
+          "sw": 25,
+          "sy": 2026,
+          "ew": 30,
+          "ey": 2026
+        },
+        "5": {
+          "n": "Casting release",
+          "sw": 32,
+          "sy": 2026,
+          "ew": 34,
+          "ey": 2026
+        }
+      }
+    },
+    "l3_tooling": {
+      "file": "L3_Tooling.xlsx",
+      "key": "L3_Tooling",
+      "name": "Tooling",
+      "acts": {
+        "1": {
+          "n": "Tooling concept",
+          "sw": 9,
+          "sy": 2026,
+          "ew": 12,
+          "ey": 2026
+        },
+        "2": {
+          "n": "Die design",
+          "sw": 13,
+          "sy": 2026,
+          "ew": 18,
+          "ey": 2026
+        },
+        "3": {
+          "n": "Die manufacture",
+          "sw": 19,
+          "sy": 2026,
+          "ew": 28,
+          "ey": 2026
+        },
+        "4": {
+          "n": "Try-out and buy-off",
+          "sw": 29,
+          "sy": 2026,
+          "ew": 34,
+          "ey": 2026
+        },
+        "5": {
+          "n": "Tooling handover",
+          "sw": 35,
+          "sy": 2026,
+          "ew": 38,
+          "ey": 2026
+        }
+      }
+    },
+    "l4_assembly": {
+      "file": "L4_Assembly.xlsx",
+      "key": "L4_Assembly",
+      "name": "Assembly",
+      "acts": {
+        "1": {
+          "n": "Station layout",
+          "sw": 20,
+          "sy": 2026,
+          "ew": 24,
+          "ey": 2026
+        },
+        "2": {
+          "n": "Torque tool spec",
+          "sw": 25,
+          "sy": 2026,
+          "ew": 29,
+          "ey": 2026
+        },
+        "3": {
+          "n": "Line balancing",
+          "sw": 30,
+          "sy": 2026,
+          "ew": 34,
+          "ey": 2026
+        },
+        "4": {
+          "n": "Pilot assembly build",
+          "sw": 36,
+          "sy": 2026,
+          "ew": 41,
+          "ey": 2026
+        },
+        "5": {
+          "n": "Assembly readiness",
+          "sw": 44,
+          "sy": 2026,
+          "ew": 48,
+          "ey": 2026
+        }
+      }
+    },
+    "l4_paint": {
+      "file": "L4_Paint.xlsx",
+      "key": "L4_Paint",
+      "name": "Paint",
+      "acts": {
+        "1": {
+          "n": "Colour palette approval",
+          "sw": 16,
+          "sy": 2026,
+          "ew": 20,
+          "ey": 2026
+        },
+        "2": {
+          "n": "Paint process trial",
+          "sw": 21,
+          "sy": 2026,
+          "ew": 20,
+          "ey": 2026
+        },
+        "3": {
+          "n": "Booth modification",
+          "sw": 27,
+          "sy": 2026,
+          "ew": 33,
+          "ey": 2026
+        },
+        "4": {
+          "n": "Paint quality validation",
+          "sw": 34,
+          "sy": 2026,
+          "ew": 39,
+          "ey": 2026
+        },
+        "5": {
+          "n": "Paint release",
+          "sw": 41,
+          "sy": 2026,
+          "ew": 45,
+          "ey": 2026
+        }
+      }
+    },
+    "l4_logistics": {
+      "file": "L4_Logistics.xlsx",
+      "key": "L4_Logistics",
+      "name": "Logistics",
+      "acts": {
+        "1": {
+          "n": "Packaging concept",
+          "sw": 18,
+          "sy": 2026,
+          "ew": 22,
+          "ey": 2026
+        },
+        "2": {
+          "n": "Inbound flow design",
+          "sw": 23,
+          "sy": 2026,
+          "ew": 28,
+          "ey": 2026
+        },
+        "3": {
+          "n": "Warehouse readiness",
+          "sw": 29,
+          "sy": 2026,
+          "ew": 34,
+          "ey": 2026
+        },
+        "4": {
+          "n": "Supplier ramp plan",
+          "sw": 35,
+          "sy": 2026,
+          "ew": 38,
+          "ey": 2026
+        },
+        "5": {
+          "n": "Logistics sign-off",
+          "sw": 42,
+          "sy": 2026,
+          "ew": 43,
+          "ey": 2026
+        }
+      }
+    },
+    "l4_quality": {
+      "file": "L4_Quality.xlsx",
+      "key": "L4_Quality",
+      "name": "Quality",
+      "acts": {
+        "1": {
+          "n": "Measurement plan",
+          "sw": 17,
+          "sy": 2026,
+          "ew": 21,
+          "ey": 2026
+        },
+        "2": {
+          "n": "Gauge procurement",
+          "sw": 22,
+          "sy": 2026,
+          "ew": 27,
+          "ey": 2026
+        },
+        "3": {
+          "n": "Capability studies",
+          "sw": 28,
+          "sy": 2026,
+          "ew": 34,
+          "ey": 2026
+        },
+        "4": {
+          "n": "Audit readiness",
+          "sw": 35,
+          "sy": 2026,
+          "ew": 40,
+          "ey": 2026
+        },
+        "5": {
+          "n": "Quality gate",
+          "sw": 43,
+          "sy": 2026,
+          "ew": 47,
+          "ey": 2026
+        }
+      }
+    },
+    "l5_supplier_a": {
+      "file": "L5_Supplier_A.xlsx",
+      "key": "L5_Supplier_A",
+      "name": "Supplier A",
+      "acts": {
+        "1": {
+          "n": "Nomination",
+          "sw": 6,
+          "sy": 2026,
+          "ew": 11,
+          "ey": 2026
+        },
+        "2": {
+          "n": "Tooling kick-off",
+          "sw": 10,
+          "sy": 2026,
+          "ew": 16,
+          "ey": 2026
+        },
+        "3": {
+          "n": "Sample submission",
+          "sw": 17,
+          "sy": 2026,
+          "ew": 19,
+          "ey": 2026
+        },
+        "4": {
+          "n": "PPAP approval",
+          "sw": 24,
+          "sy": 2026,
+          "ew": 30,
+          "ey": 2026
+        },
+        "5": {
+          "n": "Series capacity ramp",
+          "sw": 32,
+          "sy": 2026,
+          "ew": 40,
+          "ey": 2026
+        }
+      }
+    },
+    "l5_supplier_b": {
+      "file": "L5_Supplier_B.xlsx",
+      "key": "L5_Supplier_B",
+      "name": "Supplier B",
+      "acts": {
+        "1": {
+          "n": "Nomination",
+          "sw": 7,
+          "sy": 2026,
+          "ew": 11,
+          "ey": 2026
+        },
+        "2": {
+          "n": "Process audit",
+          "sw": 12,
+          "sy": 2026,
+          "ew": 17,
+          "ey": 2026
+        },
+        "3": {
+          "n": "Sample submission",
+          "sw": 18,
+          "sy": 2026,
+          "ew": 25,
+          "ey": 2026
+        },
+        "4": {
+          "n": "Capacity verification",
+          "sw": 26,
+          "sy": 2026,
+          "ew": 33,
+          "ey": 2026
+        },
+        "5": {
+          "n": "Series release",
+          "sw": 35,
+          "sy": 2026,
+          "ew": 41,
+          "ey": 2026
+        }
+      }
+    }
+  }
+}
