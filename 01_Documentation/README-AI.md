@@ -1018,3 +1018,17 @@ renderer — a milestone that appears on screen appears in every export.
 over the header while the grid scrolled, so the line appeared to run up through the month and year
 bands. Do not raise it above 39. (The current-week marker is deliberately different — it is
 `zIndex: 45` with `top:0;bottom:0` so it *does* span the header.)
+
+
+---
+
+## 0.13 Version pill (2026-08-08)
+
+`APP_VERSION` is the string `'Version 2.7'`. Alongside it: `APP_PUBLISHED` (`'15 Aug 2026'`),
+`APP_AUTHOR`, `APP_AUTHOR_EMAIL` and `APP_VERSION_TOOLTIP` (a newline-joined native `title`
+fallback). The pill in the top bar is `position:relative` and opens a hover card
+(`state.verHover`, set by `onVerEnter`/`onVerLeave`) listing version, publish date, author and
+email. `APP_VERSION` is still what the report headers print, so changing it changes both.
+
+`dist/01_Documentation/` holds exactly one logo file, `logo.svg` — the duplicate copy under the
+original Volvo file name was removed. That name is the only one `LOGO_FOLDER_CANDIDATES` looks for.
