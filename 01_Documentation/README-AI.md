@@ -899,3 +899,122 @@ button look dead). Each arms on the first click — `state.discardArmed` / `stat
 swaps to "Click again to …", auto-disarms after 5 s / 6 s — and acts on the second. `onClearFile`
 also resets the baseline state (`baselines`, `baselineId`, `baselineTo`, `baselineConfirm`), which
 it used to leave behind. `onReloadFolder` still uses `confirm()`.
+
+
+---
+
+## 0.11 Brand logo (v2.9, 2026-08-08)
+
+The heading strip and every export now carry a logo. `APP_VERSION` is `'Version 2.9'`.
+
+**Precedence** (`initLogo()`, run from `componentDidMount`):
+
+1. `idbGet('brandLogo')` — an image the user picked with **Files -> Branding -> Replace logo...**,
+   stored as `{src (data URL), name, source:'picked', ratio}`.
+2. The first URL in `LOGO_FOLDER_CANDIDATES` that `fetch` resolves —
+   `../01_Documentation/logo.svg`, `.../logo.png`, then flatter fallbacks. This is the "swap the
+   file, everyone gets the new logo" route. **It only works when the pack is served over http(s);**
+   `file://` blocks the fetch, which is why step 3 exists and is the normal offline case.
+3. `LOGO_BUILTIN` — the Volvo word mark inlined as an SVG data URL in the source.
+
+`state.logoOn` (persisted inverted under IDB key `brandLogoOff`) hides it everywhere without
+discarding it. `onResetLogo` deletes `brandLogo` and re-runs `initLogo`, so "Use default" falls
+back to the folder file before the built-in.
+
+`logoForExport()` is the single accessor every non-DOM consumer uses — it returns `null` when the
+logo is off, so a hidden logo can never leak into an export:
+
+- `buildExportSVG` draws an `<image href="dataURL">` right-aligned in the 54px `infoH` band,
+  24px tall, width `24 * ratio` capped at 200px. Data URLs keep the SVG self-contained and keep the
+  PNG rasterisation untainted.
+- `reportHeader()` (impact report, status sheets) absolutely-positions a 24px `<img>` at the top
+  right and reserves `padding-right:190px` on `.hd`.
+
+`ratio` is measured once on load with `imageRatio()` (an `Image` probe, falling back to the
+built-in 524.06/45.51) so an arbitrary user logo is never squashed.
+
+The **Edit heading** button was shortened to **Edit** to make room; the logo sits to its right behind
+a divider, at the far right of the heading strip.
+
+`dist/01_Documentation/` ships `logo.svg` (the file `initLogo` looks for) plus the original
+`Volvo_Spread_Word_Mark_2025_bl.svg`.
+
+
+---
+
+## 0.12 Milestones, PDF sizes, print footer, black accent (v2.9, 2026-08-08)
+
+### Milestones
+
+Dashboard-owned markers on the week axis. They are NOT read from or written to any workbook —
+they live in `localStorage` under `tpDashboardMilestonesV1` as
+`[{id, shape, color, label, wk, yr, on}]` (`loadMilestones` / `saveMilestones`;
+`writeMilestones(list)` is the single write path and always does both storage + setState).
+
+- `MS_SHAPES` — diamond (key deliverable), triangle (event deadline / review), circle (minor
+  check-in), square (major start or closure gate). Add one here and it appears in the picker, the
+  legend and both renderers automatically.
+- `MS_COLORS` — five fixed swatches. Not a free colour picker on purpose.
+- `msBoxStyle(shape, color, size)` returns a React style object; `msSvgShape(...)` returns the
+  equivalent SVG node string. **Both must agree** — the on-screen marker and the exported marker are
+  drawn by different code from the same record.
+- `activeMilestones()` is the only thing renderers call: switched on, week 1–53, year > 1000.
+
+New page `state.page === 'milestones'` (nav tab between Master Plan and the plan tabs, labelled
+with the count). One row per milestone: shape buttons, colour swatches, name, week, year, Show
+checkbox, delete. `msRows` in `renderVals` builds it all, including the per-option click handlers.
+
+**Master plan rendering.** `weekHeaderH` is **74** when any milestone is active, **54** otherwise
+— the extra 20px is the milestone band between the month row (top 19) and the week numbers.
+The template's three former literal `54px` values (left header block, week header, arrow-overlay
+`top`) are now `{{ weekHeaderH }}`; **if you add a fourth consumer of the header height, use the
+same value.** `msMarkers` positions the **name above the symbol** (black `#1F2430`, 9px) centred on the week column; `msLines` draws a
+1.5px line from `weekHeaderH` down `msContentH` = `sum(section.activities.length*28) +
+(sections.length-1)*3` — the same accumulator §4.2 warns about, so a row-height change means three
+edits now, not two. Milestones outside the Snapshot window are counted into `msOffAxisNote`
+rather than silently dropped.
+
+**Export rendering.** `buildExportSVG` sets `headerH = msOn ? 72 : 52` and derives
+`weekTextY = infoH + headerH - 6` (the old hardcoded `infoH+46` in two places). Markers draw at `infoH+52` with the label baseline at `infoH+40` (name above symbol, black),
+lines from `topH` to `height`, both pushed after the bars and before the
+current-week rect so they read on top.
+
+### PDF page sizes and footer
+
+`Component.PDF_SIZES` — `letter` (11×8.5in), `a3` (16.54×11.69), `a2` (23.39×16.54), all
+landscape, all in inches; `css` is the `@page size` value. `onExportPDF(sizeKey)` takes the key
+(defaulting to letter) and reserves 22px at the foot of the sheet for the footer, so the artwork
+scale is computed against `availH - footH`. The Export panel renders the three as a row from
+`pdfSizes`.
+
+`footerLine()` returns the footer parts: the `pdfFooterNote` prop (default
+"Confidential — internal use only"), programme title, code, revision, date. `reportFooter(n, total)`
+wraps them in `.pfoot` for the print reports — one per `.page` in `buildStatusSheets` (with real
+page numbers), one at the end of `reportShell` for the impact report.
+
+### Accent
+
+`accentColor` defaults to `#000000` and the two `accent==='#000000' ? '#1F3864' : accent`
+substitutions (heading stripe on screen, stripe in the SVG export) are **gone** — black now means
+black. `reportShell`'s `.hd` border and the Export panel's PDF buttons read the prop too.
+
+### Empty state
+
+The no-file card leads with the logo at 40px above a divider (`logoEmptyStyle`, same
+background-image technique as §0.11).
+
+
+### Verified in exports (2026-08-08)
+
+The SVG export was captured and inspected: milestone symbols, their black labels and their full-height
+colour lines all render, together with the brand logo in the top-right of the header band. PNG is a
+canvas raster of that same SVG and the PDF print window embeds the same string, so all three share one
+renderer — a milestone that appears on screen appears in every export.
+
+
+### Milestone line stacking (fix, 2026-08-08)
+
+`msLines` sits at `zIndex: 30`, **below** the sticky week header's `zIndex: 40`. At 44 it drew
+over the header while the grid scrolled, so the line appeared to run up through the month and year
+bands. Do not raise it above 39. (The current-week marker is deliberately different — it is
+`zIndex: 45` with `top:0;bottom:0` so it *does* span the header.)
