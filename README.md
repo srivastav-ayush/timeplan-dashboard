@@ -49,8 +49,9 @@ README.md                      this file
 ```
 
 Two folders appear inside `03_Time_Plans` as you use it: `_baselines/` (dated snapshots for the
-Baseline view) and `04_Archived_Timeplans/` (the version each file replaced, dated). Nothing in
-the code hardcodes any of these names — rename them freely.
+Baseline view) and `04_Archived_Timeplans/` (the version each file replaced, dated). A
+`Dashboard_Settings.json` appears there too if you ask for one — see *Your settings are kept*.
+Nothing in the code hardcodes any of these names — rename them freely.
 
 ## One file per timeplan
 
@@ -99,7 +100,8 @@ listed under Warnings and drawn as a red chip; a typo is never silently dropped.
 
 | | |
 |---|---|
-| **Files** | Source folder, reload after an owner updates their file, change folder, clear. |
+| **Files** | Source folder, reload after an owner updates their file, change folder, clear, the logo, and the settings file. |
+| **Milestones** | Programme markers on the week axis — symbol, colour, name, week — drawn across every timeplan. They belong to the dashboard, not to any file. |
 | **Save to Excel (n)** | Lists exactly which timeplans changed and what changed in each, then writes them. Only changed files are rewritten. |
 | **Export** | SVG, PNG and PDF of the current view, plus printable A4 status sheets — one page per timeplan, with a sign-off line. |
 | **Warnings** | Everything wrong in the loaded files. Filter by *Problems* / *To look at*, or by one timeplan. Green when clean. |
@@ -110,6 +112,26 @@ listed under Warnings and drawn as a red chip; a typo is never silently dropped.
 
 Double-click any bar or table row to change its start/end week and, optionally, its status,
 name, responsible or location. Pending changes show in red until you save.
+
+### Your settings are kept
+
+Everything you set up on the dashboard rather than in Excel — the milestones, the heading
+fields, which timeplans and columns are ticked, the snapshot window, the logo and the tab you
+were on — is saved in the browser as you work. Close the dashboard, open it again, and it comes
+back exactly as you left it. Nothing is written into the timeplans and nothing leaves your
+machine.
+
+That covers one person on one computer. To move a setup — to another machine, or to the rest of
+the team — use **Files ▸ Save settings file**. It writes a small `Dashboard_Settings.json` into
+the timeplan folder (or downloads it if the browser cannot write there). Anyone who loads that
+folder picks it up automatically when it is newer than what their own browser holds, and
+**Load settings…** applies one by hand from anywhere.
+
+**Reset settings** clears the lot and goes back to the defaults. The timeplans, the baselines
+and the archived copies are never touched by any of this.
+
+Pending Excel edits are deliberately *not* part of it: a changed date is a change to a timeplan,
+so it stays in the red *Save to Excel* count until you write it into the file.
 
 ### Baselines
 

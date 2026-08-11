@@ -1024,7 +1024,7 @@ bands. Do not raise it above 39. (The current-week marker is deliberately differ
 
 ## 0.13 Version pill (2026-08-08)
 
-`APP_VERSION` is the string `'Version 2.7'`. Alongside it: `APP_PUBLISHED` (`'15 Aug 2026'`),
+`APP_VERSION` is the string `'Version 2.8'` (see §0.14). Alongside it: `APP_PUBLISHED` (`'15 Aug 2026'`),
 `APP_AUTHOR`, `APP_AUTHOR_EMAIL` and `APP_VERSION_TOOLTIP` (a newline-joined native `title`
 fallback). The pill in the top bar is `position:relative` and opens a hover card
 (`state.verHover`, set by `onVerEnter`/`onVerLeave`) listing version, publish date, author and
@@ -1032,3 +1032,78 @@ email. `APP_VERSION` is still what the report headers print, so changing it chan
 
 `dist/01_Documentation/` holds exactly one logo file, `logo.svg` — the duplicate copy under the
 original Volvo file name was removed. That name is the only one `LOGO_FOLDER_CANDIDATES` looks for.
+
+---
+
+## 0.14 Session persistence (v2.8, 2026-08-10)
+
+Everything the user authors **on** the dashboard rather than in a workbook now survives a close.
+Before this, only the milestones (`tpDashboardMilestonesV1`) and the heading
+(`tpDashboardHeadingV1`) persisted; timeplan tick state, column choices, the crop and the open
+page were rebuilt from scratch on every load.
+
+### The record
+
+`SESSION_KEY = 'tpDashboardSessionV1'`, `SESSION_FILE = 'Dashboard_Settings.json'`,
+`SESSION_VERSION = 1`. Helpers `readSession()` / `writeSession(rec)` / `sessionBody(rec)` /
+`sessionStamp(iso)` sit next to `saveHeading`. The record:
+
+```
+{v, savedAt, hdr, milestones, columnVisible, compactTimeline, logoOn, logoHeight,
+ healthSev, healthPlan, showBaseline, baselineId,
+ page, crop, visible, planNameVisible, activityVisibility}
+```
+
+The last five are **plan-scoped**. `sessionRecord(prev)` only refreshes them while
+`fileLoaded && plans.length`; with an empty dashboard the previous values are copied through
+untouched, so opening the page before loading files can never wipe them.
+
+`hdr` and `milestones` are duplicated here on purpose — their own two keys stay the single source
+for the existing `loadHeading`/`loadMilestones` paths, and `sessionPatch` writes back through
+`saveHeading`/`saveMilestones` so the three keys cannot drift.
+
+### Write path
+
+`componentDidUpdate` debounces `persistSession` by 350 ms; `componentWillUnmount` flushes it.
+`persistSession` compares `sessionBody(rec)` — the record **minus `savedAt`** — against
+`this._sessionBody` and skips identical writes, so a hover re-render does not touch storage and
+`savedAt` does not creep. It never calls `setState`, so there is no update loop.
+
+### Read path
+
+1. `componentDidMount` applies `sessionPatch(rec, null)` **synchronously, before** the async
+   IndexedDB restore, so the defaults never flash.
+2. `loadFileEntries` re-reads the record after parsing and lays it over the freshly computed
+   defaults: `{...visible, ...patch.visible}`, likewise `planNameVisible`.
+
+`sessionPatch(rec, plans)` validates every field by type and filters plan-scoped keys to ids that
+exist in the current set (`activityVisibility` keys split on `|` first, per §0.2). A restored
+`crop` is only applied when it **overlaps** `computeDefaultRange(plans)` — a window from another
+programme would otherwise draw an empty grid. A restored `baselineId` is only applied when that
+snapshot is actually present.
+
+### The settings file
+
+`onSaveSessionFile` writes the record as JSON into `loadDirHandle` (the timeplan folder) with the
+same permission dance as `onTakeBaseline`, and falls back to `downloadBlob`. `readFolderSession(dir)`
+is called from `triggerFolderPicker` and stashes any `Dashboard_Settings.json` on
+`this._folderSession`; `loadFileEntries` prefers it over the local record **only when its
+`savedAt` string is later** (ISO, so lexicographic compare is correct), then clears it. That is
+what lets one person's setup follow the folder to another machine without ever clobbering newer
+local work. `onLoadSessionFile` applies one by hand and rejects a baseline file (it has
+`plans`/`activities`).
+
+`onResetSession` is two-click like `onClearFile`, clears all three keys and restores the defaults;
+plans and baselines are untouched.
+
+### Deliberately not persisted
+
+`edits` and `planNameOverrides`. Those are pending **workbook** writes, already surfaced by the
+red Save to Excel count; restoring them silently would let a stale edit be written into a file
+that has since changed on disk.
+
+### UI
+
+A *Dashboard settings* section at the foot of the Files panel (Save settings file · Load
+settings… · Reset settings, plus `sessionTargetLabel` and `sessionStampLabel`). The panel gained
+`max-height:calc(100vh - 130px); overflow:auto` — it is now ~674 px tall.
