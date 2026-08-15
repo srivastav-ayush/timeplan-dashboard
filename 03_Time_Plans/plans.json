@@ -1,0 +1,14 @@
+{
+  "note": "Manifest used by the dashboard to auto-load this folder when it is opened from a web server. Add or remove file names here when the set of timeplans changes.",
+  "files": [
+    "L1_Programme.xlsx",
+    "L2_Bodyshop.xlsx",
+    "L3_Tooling.xlsx",
+    "L4_Assembly.xlsx",
+    "L4_Quality.xlsx",
+    "L5_Supplier_A.xlsx"
+  ],
+  "baselines": [
+    "_baselines/2026-07.json"
+  ]
+}
