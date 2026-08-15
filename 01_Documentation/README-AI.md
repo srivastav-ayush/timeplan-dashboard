@@ -3,12 +3,187 @@
 Complete reference for anyone (human or AI) maintaining, extending or debugging this project.
 `README.md` is the short user-facing version.
 
-**Read §0 first.** As of 2026-08-07 the dashboard reads **many workbooks (one per timeplan)** instead
-of one master workbook with five input sheets. §0 is authoritative wherever it contradicts a later
-section; the later sections are still correct about *the shape of one input sheet* and about the zip /
-XML / rendering machinery, which did not change.
+---
+
+# Part A — Orientation
+
+Everything in Part A is the current, authoritative picture. Part B (§0 onward) is the detailed
+reference and the dated revision log; where the log contradicts Part A, Part A wins.
+
+## A.1 How to read this document
+
+| If you are… | Start at |
+|---|---|
+| new to the project | A.2, A.3, A.4 — then §2 for the workbook and §3 for the parser |
+| changing the Excel side | §2 (workbook construction), then §3.2 layout discovery |
+| changing how it draws | §4 (rendering), §4.2 geometry constants |
+| changing save / write-back | §5, then §0.6 and §0.10 |
+| changing what persists | §0.14 and A.7 |
+| debugging "my file did not load" | A.6 (the skip rules), then §3.3 |
+| adding a column | A.8 (the checklist) |
+| deploying to a team | A.9 |
+
+## A.2 What the thing is
+
+One HTML file, no build step, no dependencies, no network. It:
+
+1. reads N Excel workbooks (one per timeplan) out of one folder,
+2. parses the xlsx zip itself — no SheetJS, no library at all,
+3. stacks every plan into one Gantt ordered by the `L{n}` in the file name,
+4. resolves cross-file dependency references and reports the ones that cannot work,
+5. lets a user edit dates and writes each changed workbook back **rebuilt from its own bytes**,
+6. keeps a dated copy of every version it replaces.
+
+It is a Design Component (`Time Plan Dashboard.dc.html`) that is inlined into a single
+standalone HTML file for distribution. The standalone is the artefact users get; the DC is the
+source. **Edit the DC, then re-inline — never hand-edit the standalone.**
+
+## A.3 The five invariants
+
+Break any of these and something downstream breaks silently. They are the load-bearing rules.
+
+1. **One .xlsx = one timeplan.** The level and the sort order come from the *file name*
+   (`L{1-9}_Name.xlsx`), never from anything inside the file.
+2. **A file is rebuilt from its own bytes on save.** Edits to `L2_Bodyshop` can never reach
+   `L1_Programme`'s file. Every rebuild is re-parsed and verified before a byte is written; a
+   value that does not round-trip aborts the whole save.
+3. **Excel owns colour, status and structure. The dashboard owns the view.** There is no colour
+   picker in the dashboard — it reads what the workbook says. Milestones, markers, heading,
+   logo, ticks and week window are dashboard-owned and never written into a workbook.
+4. **Tracker is recomputed, never read.** The identical rule lives as a self-contained formula in
+   the xlsx and as JS in the dashboard, so the two can never disagree. The cell's cached value is
+   empty until Excel recalculates, which is why the file's value is ignored.
+5. **Identity is Plan ID first, file name second, activity No. third.** This is what survives a
+   file rename in baselines and dependency resolution.
+
+## A.4 Data flow, end to end
+
+```
+  folder picker / drag / plans.json over http
+        |
+        v
+  readFileList / directory scan        skip rules -> "skipped" list -> Risks > File checks
+        |
+        v
+  unzip (inflate raw, no library)  ->  xl/workbook.xml, sharedStrings, styles, sheetN.xml
+        |
+        v
+  parsePlanFileName(name)          ->  {base, level, name}
+  layout discovery on "L{n} input" ->  header row, column map, first activity row
+        |
+        v
+  row scan (up to 2000 rows)       ->  activities[]  {no, name, resp, dept, loc, s/e wk+yr,
+        |                                             status, colour, comments, deps[]}
+        v
+  resolveRef() per dependency      ->  edges[]  +  unresolved[] -> File checks
+        |
+        v
+  week axis (min..max, <=700)      ->  render master / per-plan tabs / SVG / PNG / PDF / A4
+        |
+        v
+  edits -> pendingEdits (red)      ->  Save to Excel: archive old, rebuild, verify, write
+```
+
+## A.5 Where state lives
+
+| Store | Key | Holds | Cleared by |
+|---|---|---|---|
+| `localStorage` | `tpDashboardSessionV1` | the whole dashboard view record | Files ▸ Reset view |
+| `localStorage` | `tpDashboardSavedBy` | the name stamped into `Dashboard_Settings.json` | not cleared by Reset view |
+| `IndexedDB` | `planFiles` | last-loaded workbook bytes, for offline reopen | Clear |
+| `IndexedDB` | `outDir` | the save-target directory handle | Clear |
+| the folder | `Dashboard_Settings.json` | the team's shared view record | deleting the file |
+| the folder | `_baselines/*.json` | dated snapshots | deleting the files |
+
+Pending Excel edits are deliberately in **none** of these. A changed date is a change to a
+timeplan, so it stays in the red *Save to Excel* count until it is written into the file.
+
+## A.6 Why a file did not load
+
+The folder scan skips, and reports, in this order. All of it surfaces under Risks ▸ File checks —
+nothing is dropped in silence.
+
+| Skipped | Reason given |
+|---|---|
+| `~$Anything.xlsx` | Excel lock file — filtered before the list is even built |
+| not `.xlsx` | "it is not an .xlsx file" |
+| in a subfolder | "only files at the top level of the folder are loaded" |
+| `… (1).xlsx`, `conflicted copy`, `Copy of …` | "it looks like a sync conflict or a duplicate copy" |
+| not `L{1-9}_Name` (strict mode) | "the name does not follow L{level}_Name.xlsx" |
+
+The conflict pattern matters on a synced drive: Google Drive, Dropbox and OneDrive all resolve a
+double-write by keeping both files under a decorated name. Loading both would silently duplicate a
+plan, so they are reported instead.
+
+## A.7 The shared settings file, and the overwrite guard
+
+`Dashboard_Settings.json` is **one file per folder for the whole team**, which makes Save Dashboard
+a multi-user write. The record carries two fields that are excluded from the change-detection body
+(`sessionBody()` strips both, or the record would rewrite itself every render):
+
+- `savedAt` — ISO 8601. Written on every save.
+- `savedBy` — free text, prompted once per browser and kept in `tpDashboardSavedBy`.
+
+On `onSaveSessionFile` the folder's existing file is re-read *before* the write. If its `savedAt`
+is greater than `state.sessionSavedAt` (the stamp of the record this browser is working from),
+somebody else has saved since — a `confirm()` names them and the time and asks before replacing.
+Declining writes nothing and points at Files ▸ Load view…. ISO 8601 strings compare correctly
+lexicographically, so no date parsing is involved.
+
+On load, the folder record is applied only when its `savedAt` is newer than the browser's own.
+The Files panel stamp reads "Saved by X — <time>" when a name is present.
+
+This is a *guard*, not a lock: it cannot stop two people writing within the same read window. The
+documented mitigation is organisational — nominate one owner of the team view (README §8).
+
+## A.8 Adding a column: the checklist
+
+A new activity column touches seven places. Miss one and it half-works.
+
+1. `02_Templates/*.xlsx` — the column, its width, its formatting, rows 7–106.
+2. The header alias map (`'dependencies':'dependencies', 'depends on':'dependencies'` etc.) so
+   layout discovery finds it whatever the sheet calls it.
+3. The row scanner — read it into the activity object.
+4. `View ▸ Columns` — the toggle, and its default.
+5. The master-plan and per-plan tab renderers — heading cell **and** body cell, both `flex:none`
+   with matching widths (see the alignment note in the 2026-08-15 log entry).
+6. The SVG / PNG / PDF exporters and the A4 status sheets.
+7. Write-back, if it is editable — the cell write, and the round-trip verification.
+
+## A.9 Deployment on a synced drive
+
+The intended deployment is a shared folder mirrored to every machine (Google Drive for desktop,
+OneDrive, Dropbox), each person opening their own local copy of the HTML.
+
+- **Mirror, not stream.** Streaming mode leaves placeholder files; a directory scan then triggers N
+  on-demand downloads, which is slow and fails with no connection. Mirror mode is a hard
+  requirement for the offline promise.
+- **The HTML cannot be run from the provider's web viewer.** Drive serves it as text. It must be
+  opened from the local mirror, over `file://`.
+- **`file://` means no `plans.json`.** `fetch` is blocked on `file://`, so `autoLoadManifest()`
+  quietly no-ops and the folder picker is the only way in. `plans.json` is dead weight in every
+  folder-based deployment; it exists for the http case only.
+- **Permissions belong per subfolder** — edit on `03_Time_Plans`, read-only on `02_Templates` and
+  the dashboard folder.
+- **The archive folder syncs.** `04_Archived_Timeplans/` grows one workbook per save and
+  replicates to every machine. *Archive elsewhere…* points it outside the synced tree.
+- **Excel holds a lock.** An open workbook cannot be cleanly overwritten or synced; the
+  stale-check (size + mtime compared against load time) catches the read side, not the lock.
+
+## A.10 After any change
+
+Non-negotiable, in this order:
+
+1. Edit the DC, never the standalone.
+2. Re-inline to `Time Plan Dashboard (Standalone).html`.
+3. Copy that to `dist/05_Master_Time_Plan_Dashboard/Time Plan Dashboard.html`.
+4. Load the six example timeplans and check: master plan draws, every tab draws, Risks has all
+   three tabs, an edit goes red and saves, SVG exports.
+5. Append what changed to §9, dated.
 
 ---
+
+# Part B — Reference and revision log
 
 ## 0.0 Distribution folder layout (v2.2)
 
@@ -1474,3 +1649,35 @@ The migration was done by a one-off script (zip walk + regex XML edit, the same 
 §3.1/§5). It is idempotent-unsafe: running it twice would append a second set of dxfs and a second
 validation. If a new workbook has to be migrated, port the script from the git history of this
 change rather than re-running it on an already-migrated file.
+
+
+## 2026-08-15 — shared-folder deployment: settings guard and documentation
+
+**Save Dashboard is a multi-user write, and now says so.** `Dashboard_Settings.json` is one file
+per folder shared by the whole team; previously the last person to press the button silently
+replaced everyone else's milestones, markers, heading, ticks and week window.
+
+- `savedBy` added to the settings record, prompted once per browser and kept in
+  `localStorage.tpDashboardSavedBy`. Excluded from `sessionBody()` alongside `savedAt`, so it
+  cannot trigger a rewrite on every render.
+- `onSaveSessionFile` re-reads the folder's existing settings file before writing. If its
+  `savedAt` is newer than `state.sessionSavedAt`, a `confirm()` names the person and the time
+  and asks before replacing. Declining writes nothing and points at Files ▸ Load view….
+- `state.sessionSavedBy` threaded through the four places the record is applied (mount, folder
+  load, Load view…, Reset view). The Files panel stamp reads "Saved by X — <time>" when a name
+  is present, "Your view as of <time>" when it is not.
+- Deliberately a guard, not a lock — see A.7.
+
+**Documentation restructured.**
+
+- `README.md` cut from ~18 KB to ~9 KB and rewritten for the plan owner, not the developer:
+  ten numbered sections, open-it-in-three-steps first, a four-rule shared-folder section, a
+  Google Drive section (mirror vs stream, per-folder permissions, sync conflicts, archive
+  growth), and a closing section saying plainly that `plans.json` and the legacy
+  `Time_Plan_L1-L5_Master.xlsx` can be ignored.
+- `README-AI.md` given a Part A orientation layer: how to read the document, what the thing is,
+  the five invariants, an end-to-end data-flow diagram, a state-location table, the file-skip
+  rules, the settings-guard spec, an add-a-column checklist, and the synced-drive deployment
+  notes. The existing reference and dated log are unchanged as Part B.
+
+No change to parsing, rendering, write-back, baselines, risks or exports.
