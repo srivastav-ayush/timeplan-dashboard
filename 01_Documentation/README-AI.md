@@ -10,6 +10,97 @@ Complete reference for anyone (human or AI) maintaining, extending or debugging 
 Everything in Part A is the current, authoritative picture. Part B (§0 onward) is the detailed
 reference and the dated revision log; where the log contradicts Part A, Part A wins.
 
+## A.0 Current workbook revision (2026-08-18)
+
+The workbooks were rebuilt on this date. Where §2 and the older revision log below describe a
+different layout, THIS section is what is in the files.
+
+**Input sheet — every `L{n} input` sheet in every workbook**
+
+| | |
+|---|---|
+| Row 5 | `B5` Timeplan Name label / `E5:F5` value · `G5` **Timeplan ID** label / `H5:I5` value · `J5:L5` **Timeplan Owner** label / `M5:N5` value · `O5` Last updated label / `P5` value |
+| Row 6 | blank spacer, height 9 — separates the header block from the table |
+| Row 7 | column headings |
+| Rows 8–207 | **200 activity rows**, `No.` pre-filled 1–200 |
+| `R2:U4` | Timeplan range box (Start Wk / Start Yr / End Wk / End Yr) — moved two columns right off the Dependencies column |
+| `W2:X4` | Today box: `W3 = WEEKNUM(TODAY(),21)`, `X3 = YEAR(TODAY())` |
+
+Columns: `C` Colour · `D` No. · `E` Activity / Event · `F` Responsible · `G` Department ·
+`H` Location · `I` Start Wk · `J` Start Yr · `K` End Wk · `L` End Yr · **`M` Status** ·
+**`N` Tracker** · `O` Comments / Notes · `P` Dependencies. Status now sits *before* Tracker.
+
+**Status** is the only typed column — a 14-value dropdown on `M8:M207`, in dropdown order:
+Completed, Cancelled, Skipped, Risk, Blocker, Dependency, Aligned, Planned, To be discussed,
+Not done, Deferred, Not Achieved, Pending, Not Completed. Each has its own conditional format
+(dxf ids in `STATUS_DXF`, `tools/xlsxkit.js`), matched with `operator="equal"` so
+`Not Completed` cannot trip the `Completed` rule. The dashboard's `STATUS_STYLES` uses the same
+colours.
+
+**Tracker** (`N`) is a formula, never typed — `trackerFormula()` in `tools/xlsxkit.js`, self-contained
+per row, reading `TODAY()` and the row's ISO end-of-week directly:
+
+- `Done` — Status is Completed.
+- `Closed` — Status is Cancelled or Skipped (off the plan, so never late).
+- `Incomplete` — the end week has passed and the row is not closed out.
+- `Due this week` — the current week IS the end week.
+- `On Track` — still ahead of the end week.
+- blank — no activity name, or no end week/year.
+
+Every other Status says *why* and is judged on the calendar like any other row. `TRACKER_STYLES`
+in the dashboard mirrors the five outcomes.
+
+**No. column** uses two dedicated cell formats (one per row band) with an explicit black,
+non-bold 9pt font — it no longer inherits the band's coloured/bold text.
+
+**Last updated (`P5`) is automatic.** The cell is `=TEXT(NOW(),"yyyy-mm-dd")` with a cached value,
+so Excel refreshes it whenever the workbook recalculates and nobody types a date. Two consequences:
+`NOW()` is volatile, so merely opening the file marks it dirty; and the dashboard's save-time stamp
+(§0.6) now **skips a Last updated cell that holds a formula** rather than overwriting the automation
+with a literal date.
+
+**No sheet protection anywhere.** The time-plan sheets used to carry
+`<sheetProtection sheet="1" password="DC2F" …>` (Excel's legacy 16-bit hash, `DC2F` — not a
+recoverable password, and not security). It is removed from every sheet in every workbook; §2.7 is
+superseded.
+
+**Time plan sheets**: rows 7–206 (200 rows), each row's five header cells pointing at input row
+`r+1` to account for the new blank row 6. The master workbook's stacked `master time plan` sheet is
+five 200-row blocks, rows 7–1006.
+
+### A.0.1 Audit, 2026-08-18
+
+All 14 workbooks (root master, `dist` master, 5 templates, 6 demo timeplans, `tools/_test_L1.xlsx`)
+were checked programmatically: row/cell tag balance, style and dxf ids in range, sheet refs resolve,
+Content_Types covers every part, declared `cellXfs`/`dxfs`/`mergeCells`/`dataValidations` counts match
+the elements present, no `sheetProtection`, input rows 8–207 complete with all 14 columns,
+`No.` = 1–200, per-row Tracker formula identical to `trackerFormula(r)`, every typed Status inside
+the 14-value list, every Colour inside the five, the dropdown string under Excel's 255-char limit,
+CF rule counts and dxf ids, row-5 labels, `P5` auto formula, `W3`/`X3` today formulas, time-plan
+rows 7–206 with the five header formulas pointing at input row `r+1`, grid F..LR present, the six
+`extLst` range refs, bar sqref `F7:LR206`, and the master's five 200-row blocks (rows 7–1006).
+Clean. `calcPr fullCalcOnLoad="1"` is present in every workbook, so the empty cached `<v>` on the
+Tracker and header formulas is filled the moment Excel opens the file.
+
+Two changes came out of the audit:
+
+1. **Input sheets now freeze at row 7** (`<pane ySplit="7" topLeftCell="A8" state="frozen"/>`). With
+   200 rows the column names scrolled away. `buildInputSheet` adds it.
+2. **`detectLabeledRef` scanned only columns A–N** (`col > 14` → `continue`), so the "Last updated"
+   label at **O5** was never seen and every plan reported *No Last updated date*. The bound is now
+   `col > 16` — the header block ends at P, and R onward is the week/range box, which must stay
+   outside the scan.
+
+An end-to-end load of the six demo timeplans through the shipped standalone was verified in-browser:
+6 plans / 30 activities parsed, header block read, cross-file dependencies resolved
+(`L3_Tooling-1 → L2_Bodyshop-1`), Tracker computed (`Incomplete`, `Done`, `On Track` with week
+counts), Risks/Dependency-risk/File-checks panels populated, per-plan tabs render every column.
+
+The formulas that feed the time-plan sheets test their **own** source column, not the Activity
+column: `C7 = IF('L3 input'!F8<>"",'L3 input'!F8,"")`. Only `A` (No.) and `B` (Activity) gate on
+Activity. That is the original workbook's design and is intentional.
+
+
 ## A.1 How to read this document
 
 | If you are… | Start at |

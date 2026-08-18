@@ -11,37 +11,37 @@
    "acts": {
     "1": {
      "n": "Programme kickoff",
-     "sw": 3,
-     "sy": 2026,
-     "ew": 6,
+     "sw": 51,
+     "sy": 2025,
+     "ew": 16,
      "ey": 2026
     },
     "2": {
      "n": "Concept freeze",
-     "sw": 10,
+     "sw": 19,
      "sy": 2026,
-     "ew": 14,
+     "ew": 35,
      "ey": 2026
     },
     "3": {
      "n": "Design gate G2",
-     "sw": 20,
+     "sw": 38,
      "sy": 2026,
-     "ew": 24,
+     "ew": 49,
      "ey": 2026
     },
     "4": {
      "n": "Pilot build authorisation",
-     "sw": 34,
-     "sy": 2026,
-     "ew": 38,
-     "ey": 2026
+     "sw": 6,
+     "sy": 2027,
+     "ew": 24,
+     "ey": 2027
     },
     "5": {
      "n": "Start of production",
-     "sw": 6,
+     "sw": 26,
      "sy": 2027,
-     "ew": 10,
+     "ew": 48,
      "ey": 2027
     }
    }
@@ -53,38 +53,59 @@
    "acts": {
     "1": {
      "n": "Bodyshop layout study",
-     "sw": 15,
-     "sy": 2026,
-     "ew": 19,
+     "sw": 51,
+     "sy": 2025,
+     "ew": 9,
      "ey": 2026
     },
     "2": {
      "n": "Weld line specification",
-     "sw": 20,
+     "sw": 12,
      "sy": 2026,
-     "ew": 24,
+     "ew": 22,
      "ey": 2026
     },
     "3": {
      "n": "Fixture design release",
      "sw": 25,
      "sy": 2026,
-     "ew": 28,
+     "ew": 32,
      "ey": 2026
     },
     "4": {
-     "n": "Bodyshop trial run",
-     "sw": 31,
+     "n": "Robot cell simulation",
+     "sw": 35,
      "sy": 2026,
-     "ew": 36,
+     "ew": 45,
      "ey": 2026
     },
     "5": {
-     "n": "Bodyshop sign-off",
-     "sw": 39,
+     "n": "Equipment sourcing",
+     "sw": 49,
      "sy": 2026,
-     "ew": 44,
-     "ey": 2026
+     "ew": 9,
+     "ey": 2027
+    },
+    "6": {
+     "n": "Installation window",
+     "sw": 10,
+     "sy": 2027,
+     "ew": 23,
+     "ey": 2027
+    },
+    "7": {
+     "n": "Commissioning",
+     "sw": 19,
+     "sy": 2027,
+     "ew": 32,
+     "ey": 2027
+    },
+    "8": {
+     "n": "Line buy-off",
+     "sw": 32,
+     "sy": 2027,
+     "ew": 40,
+     "ey": 2027
     }
    }
   },
@@ -94,39 +115,95 @@
    "name": "Tooling",
    "acts": {
     "1": {
-     "n": "Tooling concept",
-     "sw": 20,
-     "sy": 2026,
-     "ew": 24,
+     "n": "Tooling concept study",
+     "sw": 50,
+     "sy": 2025,
+     "ew": 3,
      "ey": 2026
     },
     "2": {
-     "n": "Die design",
-     "sw": 25,
+     "n": "Die face design",
+     "sw": 7,
      "sy": 2026,
-     "ew": 30,
+     "ew": 11,
      "ey": 2026
     },
     "3": {
-     "n": "Die manufacture",
-     "sw": 31,
+     "n": "Tool steel order",
+     "sw": 17,
      "sy": 2026,
-     "ew": 40,
+     "ew": 19,
      "ey": 2026
     },
     "4": {
-     "n": "Try-out and buy-off",
-     "sw": 41,
+     "n": "Rough machining",
+     "sw": 21,
      "sy": 2026,
-     "ew": 44,
+     "ew": 29,
      "ey": 2026
     },
     "5": {
-     "n": "Tooling handover",
-     "sw": 43,
+     "n": "Finish machining",
+     "sw": 31,
      "sy": 2026,
-     "ew": 48,
+     "ew": 35,
      "ey": 2026
+    },
+    "6": {
+     "n": "Tryout run 1",
+     "sw": 38,
+     "sy": 2026,
+     "ew": 42,
+     "ey": 2026
+    },
+    "7": {
+     "n": "Tryout run 2",
+     "sw": 45,
+     "sy": 2026,
+     "ew": 51,
+     "ey": 2026
+    },
+    "8": {
+     "n": "Surface hardening",
+     "sw": 2,
+     "sy": 2027,
+     "ew": 7,
+     "ey": 2027
+    },
+    "9": {
+     "n": "Tool transfer to plant",
+     "sw": 9,
+     "sy": 2027,
+     "ew": 15,
+     "ey": 2027
+    },
+    "10": {
+     "n": "Installation in press",
+     "sw": 13,
+     "sy": 2027,
+     "ew": 16,
+     "ey": 2027
+    },
+    "11": {
+     "n": "Production tryout",
+     "sw": 22,
+     "sy": 2027,
+     "ew": 28,
+     "ey": 2027
+    },
+    "12": {
+     "n": "Dimensional sign-off",
+     "sw": 29,
+     "sy": 2027,
+     "ew": 31,
+     "ey": 2027
+    },
+    "13": {
+     "n": "Tool handover",
+     "sw": 36,
+     "sy": 2027,
+     "ew": 42,
+     "ey": 2027
     }
    }
   },
@@ -136,39 +213,109 @@
    "name": "Assembly",
    "acts": {
     "1": {
-     "n": "Station layout",
-     "sw": 25,
-     "sy": 2026,
-     "ew": 29,
+     "n": "Assembly sequence study",
+     "sw": 50,
+     "sy": 2025,
+     "ew": 6,
      "ey": 2026
     },
     "2": {
-     "n": "Torque tool spec",
-     "sw": 30,
+     "n": "Station layout draft",
+     "sw": 6,
      "sy": 2026,
-     "ew": 33,
+     "ew": 11,
      "ey": 2026
     },
     "3": {
-     "n": "Line balancing",
-     "sw": 31,
+     "n": "Ergonomics review",
+     "sw": 14,
      "sy": 2026,
-     "ew": 36,
+     "ew": 19,
      "ey": 2026
     },
     "4": {
-     "n": "Pilot assembly build",
-     "sw": 38,
+     "n": "Torque tool selection",
+     "sw": 18,
      "sy": 2026,
-     "ew": 46,
+     "ew": 22,
      "ey": 2026
     },
     "5": {
-     "n": "Assembly readiness",
-     "sw": 47,
+     "n": "Fixture concept",
+     "sw": 28,
      "sy": 2026,
-     "ew": 51,
+     "ew": 30,
      "ey": 2026
+    },
+    "6": {
+     "n": "Fixture build",
+     "sw": 33,
+     "sy": 2026,
+     "ew": 38,
+     "ey": 2026
+    },
+    "7": {
+     "n": "Conveyor modification",
+     "sw": 35,
+     "sy": 2026,
+     "ew": 43,
+     "ey": 2026
+    },
+    "8": {
+     "n": "Station 10 build",
+     "sw": 46,
+     "sy": 2026,
+     "ew": 49,
+     "ey": 2026
+    },
+    "9": {
+     "n": "Station 20 build",
+     "sw": 1,
+     "sy": 2027,
+     "ew": 6,
+     "ey": 2027
+    },
+    "10": {
+     "n": "Station 30 build",
+     "sw": 4,
+     "sy": 2027,
+     "ew": 12,
+     "ey": 2027
+    },
+    "11": {
+     "n": "Software integration",
+     "sw": 12,
+     "sy": 2027,
+     "ew": 17,
+     "ey": 2027
+    },
+    "12": {
+     "n": "Dry-cycle testing",
+     "sw": 21,
+     "sy": 2027,
+     "ew": 26,
+     "ey": 2027
+    },
+    "13": {
+     "n": "Operator training",
+     "sw": 25,
+     "sy": 2027,
+     "ew": 28,
+     "ey": 2027
+    },
+    "14": {
+     "n": "Pre-series run",
+     "sw": 31,
+     "sy": 2027,
+     "ew": 38,
+     "ey": 2027
+    },
+    "15": {
+     "n": "Line release",
+     "sw": 40,
+     "sy": 2027,
+     "ew": 47,
+     "ey": 2027
     }
    }
   },
@@ -178,39 +325,109 @@
    "name": "Quality",
    "acts": {
     "1": {
-     "n": "Measurement plan",
-     "sw": 25,
-     "sy": 2026,
-     "ew": 29,
+     "n": "Quality plan draft",
+     "sw": 51,
+     "sy": 2025,
+     "ew": 3,
      "ey": 2026
     },
     "2": {
-     "n": "Gauge procurement",
-     "sw": 28,
+     "n": "Control plan v1",
+     "sw": 7,
      "sy": 2026,
-     "ew": 29,
+     "ew": 10,
      "ey": 2026
     },
     "3": {
-     "n": "Capability studies",
-     "sw": 32,
+     "n": "Measurement system analysis",
+     "sw": 14,
      "sy": 2026,
-     "ew": 37,
+     "ew": 17,
      "ey": 2026
     },
     "4": {
-     "n": "Audit readiness",
-     "sw": 39,
+     "n": "Gauge procurement",
+     "sw": 18,
      "sy": 2026,
-     "ew": 44,
+     "ew": 20,
      "ey": 2026
     },
     "5": {
-     "n": "Quality gate",
-     "sw": 45,
+     "n": "CMM programme write",
+     "sw": 28,
      "sy": 2026,
-     "ew": 49,
+     "ew": 36,
      "ey": 2026
+    },
+    "6": {
+     "n": "First article inspection",
+     "sw": 34,
+     "sy": 2026,
+     "ew": 41,
+     "ey": 2026
+    },
+    "7": {
+     "n": "Capability study Cp/Cpk",
+     "sw": 39,
+     "sy": 2026,
+     "ew": 41,
+     "ey": 2026
+    },
+    "8": {
+     "n": "Supplier PPAP review",
+     "sw": 47,
+     "sy": 2026,
+     "ew": 50,
+     "ey": 2026
+    },
+    "9": {
+     "n": "Layered process audit",
+     "sw": 1,
+     "sy": 2027,
+     "ew": 5,
+     "ey": 2027
+    },
+    "10": {
+     "n": "Non-conformance workflow",
+     "sw": 5,
+     "sy": 2027,
+     "ew": 11,
+     "ey": 2027
+    },
+    "11": {
+     "n": "Rework loop definition",
+     "sw": 13,
+     "sy": 2027,
+     "ew": 20,
+     "ey": 2027
+    },
+    "12": {
+     "n": "Traceability check",
+     "sw": 20,
+     "sy": 2027,
+     "ew": 25,
+     "ey": 2027
+    },
+    "13": {
+     "n": "Audit readiness review",
+     "sw": 23,
+     "sy": 2027,
+     "ew": 31,
+     "ey": 2027
+    },
+    "14": {
+     "n": "Pre-series quality gate",
+     "sw": 32,
+     "sy": 2027,
+     "ew": 36,
+     "ey": 2027
+    },
+    "15": {
+     "n": "Quality sign-off",
+     "sw": 39,
+     "sy": 2027,
+     "ew": 46,
+     "ey": 2027
     }
    }
   },
@@ -220,39 +437,144 @@
    "name": "Supplier A",
    "acts": {
     "1": {
-     "n": "Nomination",
-     "sw": 7,
-     "sy": 2026,
-     "ew": 10,
+     "n": "NDA signature",
+     "sw": 52,
+     "sy": 2025,
+     "ew": 2,
      "ey": 2026
     },
     "2": {
-     "n": "Tooling kick-off",
-     "sw": 15,
+     "n": "Technical package handover",
+     "sw": 7,
      "sy": 2026,
-     "ew": 20,
+     "ew": 11,
      "ey": 2026
     },
     "3": {
-     "n": "Sample submission",
-     "sw": 32,
+     "n": "Supplier feasibility study",
+     "sw": 9,
      "sy": 2026,
-     "ew": 38,
+     "ew": 11,
      "ey": 2026
     },
     "4": {
-     "n": "PPAP approval",
-     "sw": 39,
+     "n": "Quotation received",
+     "sw": 13,
      "sy": 2026,
-     "ew": 45,
+     "ew": 17,
      "ey": 2026
     },
     "5": {
-     "n": "Series capacity ramp",
-     "sw": 46,
+     "n": "Commercial negotiation",
+     "sw": 20,
      "sy": 2026,
-     "ew": 52,
+     "ew": 23,
      "ey": 2026
+    },
+    "6": {
+     "n": "Nomination letter",
+     "sw": 26,
+     "sy": 2026,
+     "ew": 34,
+     "ey": 2026
+    },
+    "7": {
+     "n": "Kick-off at supplier site",
+     "sw": 28,
+     "sy": 2026,
+     "ew": 33,
+     "ey": 2026
+    },
+    "8": {
+     "n": "Design review at supplier",
+     "sw": 34,
+     "sy": 2026,
+     "ew": 42,
+     "ey": 2026
+    },
+    "9": {
+     "n": "Prototype tool order",
+     "sw": 38,
+     "sy": 2026,
+     "ew": 43,
+     "ey": 2026
+    },
+    "10": {
+     "n": "Prototype parts batch 1",
+     "sw": 43,
+     "sy": 2026,
+     "ew": 47,
+     "ey": 2026
+    },
+    "11": {
+     "n": "Batch 1 inspection",
+     "sw": 49,
+     "sy": 2026,
+     "ew": 51,
+     "ey": 2026
+    },
+    "12": {
+     "n": "Corrective action round 1",
+     "sw": 2,
+     "sy": 2027,
+     "ew": 10,
+     "ey": 2027
+    },
+    "13": {
+     "n": "Prototype parts batch 2",
+     "sw": 3,
+     "sy": 2027,
+     "ew": 6,
+     "ey": 2027
+    },
+    "14": {
+     "n": "Batch 2 inspection",
+     "sw": 10,
+     "sy": 2027,
+     "ew": 13,
+     "ey": 2027
+    },
+    "15": {
+     "n": "Production tool order",
+     "sw": 16,
+     "sy": 2027,
+     "ew": 22,
+     "ey": 2027
+    },
+    "16": {
+     "n": "Run at rate preparation",
+     "sw": 19,
+     "sy": 2027,
+     "ew": 21,
+     "ey": 2027
+    },
+    "17": {
+     "n": "Run at rate",
+     "sw": 25,
+     "sy": 2027,
+     "ew": 33,
+     "ey": 2027
+    },
+    "18": {
+     "n": "PPAP submission",
+     "sw": 30,
+     "sy": 2027,
+     "ew": 32,
+     "ey": 2027
+    },
+    "19": {
+     "n": "PPAP approval",
+     "sw": 33,
+     "sy": 2027,
+     "ew": 41,
+     "ey": 2027
+    },
+    "20": {
+     "n": "Series delivery start",
+     "sw": 40,
+     "sy": 2027,
+     "ew": 44,
+     "ey": 2027
     }
    }
   }
