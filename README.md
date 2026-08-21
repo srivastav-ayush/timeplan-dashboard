@@ -6,7 +6,7 @@ One Excel file per timeplan. One HTML dashboard that reads them all and draws a 
 
 | Folder | What is in it |
 |---|---|
-| `02_Templates` | Empty L1–L5 workbooks. **Copy** one to start a new timeplan. |
+| `02_Templates` | Empty L1–L5 workbooks. **Copy** one to start a new timeplan. Also holds the old all-in-one `Time_Plan_L1-L5_Master.xlsx`, which you can ignore. |
 | `03_Time_Plans` | The live timeplans. One `.xlsx` per plan, named `L{level}_Name.xlsx`. |
 | `05_Master_Time_Plan_Dashboard` | `Time Plan Dashboard.html` — open in Chrome or Edge. |
 | `04_Exports` | Where you save pictures and PDFs. |

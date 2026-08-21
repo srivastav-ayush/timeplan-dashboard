@@ -231,7 +231,7 @@ documented mitigation is organisational — nominate one owner of the team view 
 
 A new activity column touches seven places. Miss one and it half-works.
 
-1. `02_Templates/*.xlsx` — the column, its width, its formatting, rows 7–106.
+1. `02_Templates/*.xlsx` — the column, its width, its formatting, rows 8–207.
 2. The header alias map (`'dependencies':'dependencies', 'depends on':'dependencies'` etc.) so
    layout discovery finds it whatever the sheet calls it.
 3. The row scanner — read it into the activity object.
@@ -283,7 +283,7 @@ this document and in `README.md` refers to:
 
 ```
 README.md                      user guide / GitHub landing page, at the pack root
-Time_Plan_L1-L5_Master.xlsx    the legacy all-in-one workbook, at the pack root
+02_Templates/Time_Plan_L1-L5_Master.xlsx   the legacy all-in-one workbook (moved here 2026-08-20)
 01_Documentation/              README-AI.md (this file)
 docs/                          README screenshots
 02_Templates/                  L1_TEMPLATE.xlsx … L5_TEMPLATE.xlsx — blank two-sheet starters
@@ -300,8 +300,9 @@ only ever knows the folders the user picked; the archive folder is a *picked han
 persisted in IDB under `archiveDir`) and falls back to `ARCHIVE_DIR` created inside the timeplan folder;
 `_baselines` is created relative to that folder (`BASELINE_DIR`), so the numbered names are convention and can be changed
 again without touching the app. The legacy seven-sheet master workbook was dropped from the
-distribution (it still lives at the project root as `Time_Plan_L1-L5_Master.xlsx` and still loads —
-see §0.3 case 3).
+distribution as a working plan; the copy that ships sits in `dist/02_Templates/Time_Plan_L1-L5_Master.xlsx`
+alongside the L1–L5 templates (moved out of the pack root 2026-08-20) and still loads — see §0.3 case 3.
+The project root keeps its own copy for development.
 
 ---
 
@@ -567,8 +568,9 @@ The activity scan loop no longer stops early on row count: it reads to row 2000 
 after 80 consecutive blank rows (was: 30 blanks after row 107, which would truncate a 200-row plan
 with spacer rows). The shipped files carry *row formatting* to row 216 (input) / 206 (time plan), but the Tracker
 formula, the Colour and Status dropdowns, the status colouring and the Gantt bar rules only cover
-**rows 7–106 — 100 activities**. `buildHealth` therefore warns above `TEMPLATE_ROWS` (100), naming
-both sheets to copy the last row down. Nothing in the dashboard itself caps at 100 or 200.
+**input rows 8–207 / time plan rows 7–206 — 200 activities**. `buildHealth` therefore warns above
+`TEMPLATE_ROWS` (200), naming both sheets to copy the last row down. Nothing in the dashboard itself
+caps at 200.
 
 ---
 
@@ -609,8 +611,8 @@ flattened to spaces (`"Start Wk"`). If you regenerate the workbook from a script
 | Tab | Part | Purpose | Protected |
 |---|---|---|---|
 | `L1 input` … `L5 input` | `sheet2.xml`…`sheet6.xml` | Data entry, one sheet per hierarchy level | no |
-| `L3 time plan` | `sheet7.xml` | Native Excel Gantt of L3 only | yes (`password="DC2F"`) |
-| `master time plan` | `sheet8.xml` | Native Excel Gantt of all five levels stacked | yes (`password="DC2F"`) |
+| `L3 time plan` | `sheet7.xml` | Native Excel Gantt of L3 only | **no** (unprotected 2026-08-18) |
+| `master time plan` | `sheet8.xml` | Native Excel Gantt of all five levels stacked | **no** (unprotected 2026-08-18) |
 
 The two time-plan sheets are **derived views**. They contain no typed data — every visible value is a
 formula pointing at an input sheet, and every bar is conditional formatting. The dashboard does not
@@ -631,12 +633,20 @@ Header block, rows 2–5:
 | `F3` / `G3` | "SoP" label / SoP value, e.g. `Wk 1, 2026` |
 | `E4` | Description (merged `E4:N4`) |
 | `E5` | **Timeplan Name** (merged `E5:F5`) — this level's plan name, e.g. "L1 Programme Master Plan" |
-| `G5` / `H5` | "Plan ID" label / the stable id, e.g. `L3_Tooling` (value merged `H5:I5`) — set once, never changed |
-| `J5` / `K5` | "Last updated" label / `YYYY-MM-DD` (value merged `K5:N5`); a save re-stamps it (`meta.updatedRef`) |
+| `G5` / `H5` | "**Timeplan ID**" label / the stable id, e.g. `L3_Tooling` (value merged `H5:I5`) — set once, never changed |
+| `J5` / `M5` | "**Timeplan Owner**" label (merged `J5:L5`) / the owner's name (value merged `M5:N5`) — read as `meta.owner`, keys nothing |
+| `O5` / `P5` | "Last updated" label / `YYYY-MM-DD`; a save re-stamps it (`meta.updatedRef`) |
+
+> Renamed 2026-08-18: the label reads **Timeplan ID**, not "Plan ID" — it is the key dependencies
+> are written against, and calling it a plan id made people mistake it for the display name (that is
+> the Timeplan Name cell). `PLAN_ID_LABEL_RE` accepts both spellings, so older files still load.
+> **Timeplan Owner** was added on the same row; `PLAN_OWNER_LABEL_RE` is in `HEADER_FIELD_LABEL_RES`,
+> which is what stops a blank ID cell from adopting the words "Timeplan Owner" as the plan id.
 
 > Row 5 used to be one merge, `E5:N5`, which covered the Plan ID and Last updated cells: the
-> dashboard read them but nobody could see or type them in Excel. The merge is now `E5:F5` +
-> `H5:I5` + `K5:N5` in all eleven pack workbooks and in the master.
+> dashboard read them but nobody could see or type them in Excel. Row 5 is now four label/value
+> pairs (`B5:D5`+`E5:F5`, `G5`+`H5:I5`, `J5:L5`+`M5:N5`, `O5`+`P5`) in all eleven pack workbooks
+> and in the master.
 | `B2:D2`, `B3:D3`, `B4:D4`, `B5:D5` | Row labels (merged); `B5` reads "Timeplan Name" |
 
 > The Timeplan Name row was added late. An earlier revision had the dashboard reading `E5` while the
@@ -648,18 +658,28 @@ Timeline-window block (present on every input sheet, but **only `L1 input`'s is 
 
 | Cell | Content |
 |---|---|
-| `P2:S2` | Labels: Start Wk, Start Yr, End Wk, End Yr |
-| `P3` | Timeline start week (default `1`) |
-| `Q3` | Timeline start year (default `2026`) |
-| `R3` | Timeline end week (default `52`) |
-| `S3` | Timeline end year (default `2030`) |
-| `U2:V2` | Labels: Current Wk, Current Yr |
-| `U3` | `=WEEKNUM(TODAY(),21)` — ISO week number of today |
-| `V3` | `=YEAR(TODAY())` |
-| `P4` | "Timeplan range" caption (merged `P4:S4`) |
-| `U4` | "Today" caption (merged `U4:V4`) |
+| `R2:U2` | Labels: Start Wk, Start Yr, End Wk, End Yr |
+| `R3` | Timeline start week (default `1`) |
+| `S3` | Timeline start year (default `2026`) |
+| `T3` | Timeline end week (default `52`) |
+| `U3` | Timeline end year (default `2030`) |
+| `W2:X2` | Labels: Current Wk, Current Yr |
+| `W3` | `=WEEKNUM(TODAY(),21)` — ISO week number of today |
+| `X3` | `=YEAR(TODAY())` |
+| `R4` | "Timeplan range" caption (merged `R4:U4`) |
+| `W4` | "Today" caption (merged `W4:X4`) |
 
-Activity table: **header row 6, data rows 7–106** (100 pre-formatted rows).
+> **Moved two columns right on 2026-08-18** (was `P..S` + `U..V`). The box used to sit directly on
+> top of the Dependencies column (P, 34 chars wide), so the two read as one confused block. Columns
+> R–U and W–X now have their own widths. Every reference moved with it: the time-plan sheets' seeds
+> (`$S$3`/`$R$3`), their greyout and today-marker rules (`$U$3`/`$T$3`, `$X$3`/`$W$3`), the master's
+> `LV3:LY3`/`LV5:LW5` mirror cells, and `meta.startWk…endYr` in the parser — which reads `R3`/`S3`
+> when they hold numbers and falls back to `P3`/`Q3` so pre-migration files still load.
+
+Activity table: **header row 7, data rows 8–207** (200 pre-formatted rows). **Row 6 is deliberately
+blank** — a 9pt spacer between the header block and the column headings. Nothing may be typed there;
+`detectLayout` finds the header row by looking for "Activity / Event", so the dashboard follows the
+spacer automatically, and `DEFAULT_LAYOUT` (the fallback only) says `headerRow: 7, firstDataRow: 8`.
 
 | Col | Field | Notes |
 |---|---|---|
@@ -671,8 +691,14 @@ Activity table: **header row 6, data rows 7–106** (100 pre-formatted rows).
 | H | Location | Free text. |
 | I / J | Start Wk / Start Yr | ISO week + year. **Primary date entry.** Validation: whole 1–53 / whole 1000–9999. |
 | K / L | End Wk / End Yr | ISO week + year. Same validation. |
-| M | Tracker | Formula, see §2.3. Derived, never typed. Not read by the dashboard — recomputed in JS. |
-| N | Status | Data-validation dropdown: `TBD, Planned, Aligned, Dependency, Risk, Blocker, Completed`. |
+| M | Status | Data-validation dropdown, 14 values: `Completed, Cancelled, Skipped, Risk, Blocker, Dependency, Aligned, Planned, To be discussed, Not done, Deferred, Not Achieved, Pending, Not Completed`. |
+| N | Tracker | Formula, see §2.3. Derived, never typed. Not read by the dashboard — recomputed in JS. |
+
+> **Status and Tracker swapped on 2026-08-18** (Status was N, Tracker M). Status is the column a
+> person fills in and Tracker is computed from it, so it now comes first. Both the workbook formula
+> and `HEADER_ALIASES`/`detectLayout` were updated; the parser reads the letters off the header row,
+> so a pre-swap file still loads correctly. The old seven-value status list was replaced by the 14
+> above; any `TBD` value in the shipped files was rewritten to `To be discussed`.
 | O | Comments / Notes | Free text, not rendered anywhere. |
 | P | Dependencies | `{file base name}-{No.}`, several separated by `;` or `,`. |
 
@@ -680,28 +706,35 @@ There is **no Start Date / End Date column**. An earlier revision added real dat
 shifted Status/Comments/Dependencies to O/P/Q; that was reverted. If you find a workbook shaped that
 way it is stale — do not reintroduce it.
 
-### 2.3 The `Tracker` formula (column M)
+### 2.3 The `Tracker` formula (column N)
 
-Row 7, filled down to row 106. Four outcomes: `Completed`, `Delayed Nw`, `Due this week`,
-`On Track`, plus blank when there is nothing to judge.
+Row 8, filled down to row 207. Five outcomes — `Done`, `Closed`, `Incomplete`, `Due this week`,
+`On Track` — plus blank when there is nothing to judge.
 
 ```
-=IF($E7="","",
-   IF($N7="Completed","Completed",
-     IF(OR($K7="",$L7=""),"",
-       IF(TODAY()>SUN, "Delayed "&ROUNDUP((TODAY()-SUN)/7,0)&"w",
-         IF(TODAY()>=MON, "Due this week", "On Track")))))
+=IF($E8="","",
+   IF($M8="Completed","Done",
+     IF(OR($M8="Cancelled",$M8="Skipped"),"Closed",
+       IF(OR($K8="",$L8=""),"",
+         IF(TODAY()>SUN, "Incomplete",
+           IF(TODAY()>=MON, "Due this week", "On Track"))))))
 
-   where MON = DATE($L7,1,4)-WEEKDAY(DATE($L7,1,4),3)+($K7-1)*7   Monday of the end week
+   where MON = DATE($L8,1,4)-WEEKDAY(DATE($L8,1,4),3)+($K8-1)*7   Monday of the end week
          SUN = MON+6                                              Sunday of the end week
 ```
 
 (MON and SUN are written out in full in the file — Excel has no LET in the baseline target.)
 
-Reading it: blank row or no end date → blank. `Completed` in the Status column → `Completed`,
-early or late. Otherwise the activity's end week is turned into a **real date range** and compared
-against `TODAY()`: past its Sunday → `Delayed Nw`; inside the week → `Due this week`; before it
-→ `On Track`.
+Reading it: blank row or no end date → blank. `Completed` → `Done`, early or late. `Cancelled` or
+`Skipped` → `Closed`: off the plan, so never late. Every **other** status (Risk, Blocker, Pending,
+Not done, Deferred, Not Achieved, Not Completed, Dependency, Aligned, Planned, To be discussed) says
+*why* and is judged on the calendar like anything else — the end week is turned into a **real date
+range** and compared against `TODAY()`: past its Sunday → `Incomplete`; inside the week →
+`Due this week`; before it → `On Track`.
+
+The tracker deliberately answers one question only — *is this on time?* — with the same five words
+whatever the status says. Any richer meaning belongs in the Status column, which is why that column
+now carries 14 values.
 
 `DATE(yr,1,4)` is the ISO anchor (Jan 4 is always in ISO week 1) and `WEEKDAY(...,3)` returns
 0 = Monday, so `DATE(yr,1,4)-WEEKDAY(DATE(yr,1,4),3)` is the Monday of ISO week 1 of that year.
@@ -724,14 +757,16 @@ The previous formula was `($V$3*100+$U$3) > (L7*100+K7)` with `U3 = WEEKNUM(TODA
 Also: `"Completed"` used to render as `"On Track"`, which lost the distinction between *done* and
 *not due yet*; and there was no signal at all for *due right now*.
 
-Four conditional-format rules on `M7:M106` (reusing existing dxfs, no styles.xml change):
-`Delayed` → dxf 72 (bold italic dark red on pink), `Due this week` → dxf 59 (bold amber),
-`Completed` → dxf 64 (bold green), `On Track` → dxf 61 (teal). `Delayed 21w` matches the
-`Delayed` rule by `containsText`, so the week count needs no extra rule.
+Five conditional-format rules on `N8:N207`, all `cellIs` **equal** (not `containsText`):
+`Incomplete` → dxf 88 (bold white on #C0392B), `Due this week` → dxf 59 (bold amber),
+`Done` → dxf 64 (bold green), `Closed` → dxf 81 (bold grey), `On Track` → dxf 61 (teal).
+
+> Exact match matters now: with `containsText`, `Not Completed` would match a `Completed` rule and
+> `Not done` a `Done` rule. Every status and tracker rule in every sheet is `cellIs equal`.
 
 #### The dashboard mirror
 
-`trackerFor(act)` in the DC implements the identical rule and `TRACKER_STYLES` the identical four
+`trackerFor(act)` in the DC implements the identical rule and `TRACKER_STYLES` the identical five
 colours. It is **computed, never read from column M** — a formula's cached `<v>` in the file is
 empty until Excel recalculates, so the cell is worthless to a parser. The comparison uses the
 existing `absWeek()` / `getISOWeekYear()` pair (the same absolute-week scale the Risks view uses),
@@ -741,17 +776,46 @@ Surfaced in: the master plan's left grid (last column, after Status), each timep
 the SVG/PNG/PDF export, and the printed status sheets. Toggle under **View ▸ Columns**
 (`columnVisible.tracker`, default on).
 
-If you change the four labels or colours, change them in **both** places — the Excel formula and
+If you change the five labels or colours, change them in **both** places — the Excel formula and
 `TRACKER_STYLES`/`trackerFor` — or the sheet and the dashboard will disagree.
 
 ### 2.4 Status colouring
 
-`N7:N106` carries seven `containsText` conditional-format rules, one per status value, each pointing
-at a `dxf` in `xl/styles.xml`. The same seven dxfs are reused on the time-plan sheets' status columns
-(`'L3 time plan'!E7:E106`, `'master time plan'!F7:F506`), so status colours stay consistent.
+`M8:M207` carries **fourteen `cellIs equal`** conditional-format rules, one per status value, each
+pointing at a `dxf` in `xl/styles.xml`. The same fourteen dxfs are reused on the time-plan sheets'
+status columns (`'L{n} time plan'!E7:E206`, `'master time plan'!F7:F1006`), so status colours stay
+consistent.
+
+| Status | dxf | Colour | Reads as |
+|---|---|---|---|
+| Completed | 64 | bold #1E8449 on #D5F5E3 | closed, delivered |
+| Cancelled | 81 | bold #7B7D7D on #E5E7E9 | closed, will not happen |
+| Skipped | 82 | italic #7B7D7D on #F2F3F4 | closed, passed over |
+| Risk | 59 | bold #B9770E on #FAE5D3 | in trouble |
+| Blocker | 58 | white on #E74C3C | stopped |
+| Dependency | 60 | italic #9A7D0A on #FCF3CF | waiting on someone else |
+| Aligned | 61 | #117864 on #D1F2EB | agreed |
+| Planned | 62 | #1A5276 on #D6EAF8 | scheduled |
+| To be discussed | 63 | italic #5D6D7E on #EAECEE | not decided |
+| Not done | 85 | #A93226 on #FDEDEC | not started |
+| Deferred | 87 | italic #6C3483 on #EBDEF0 | pushed out on purpose |
+| Not Achieved | 83 | bold #922B21 on #F5B7B1 | missed |
+| Pending | 86 | #9A7D0A on #FEF5E7 | in progress, waiting |
+| Not Completed | 84 | #922B21 on #FADBD8 | started, not finished |
+
+dxfs 81–88 were **appended** to `xl/styles.xml` on 2026-08-18 (81 doubles as the tracker's `Closed`,
+88 is the tracker's `Incomplete`); `dxfs count` went 81 → 89. `patchStyles()` in `tools/xlsxkit.js`
+refuses to run twice by checking `cellXfs count`.
 
 The dashboard hardcodes an equivalent palette in `STATUS_STYLES` — if you change the Excel dxfs,
-change `STATUS_STYLES` too, or the two views will disagree.
+change `STATUS_STYLES` too, or the two views will disagree. It is also what feeds the Status dropdown
+in the dashboard's own edit popup (`statusOptions: Object.keys(STATUS_STYLES)`), so the two lists can
+never drift apart.
+
+**Serial numbers (column D) are plain black, not bold.** Every data row used to carry its own `xf`
+with a bold coloured font from `PALETTE_FALLBACK` — the No. column literally changed colour row by
+row. Two new `xf` entries (185 = band fill 43, 186 = band fill 6) with one new black 9pt non-bold
+font are now used for every D cell.
 
 ### 2.5 `L3 time plan` (sheet7)
 
@@ -768,17 +832,20 @@ A3 = IF('L3 input'!E4<>"",'L3 input'!E4,"")
 
 `master time plan!A1:A3` carry the same three formulas against `'L1 input'`.
 
-Row-header labels are literal text in `A4:E6` (merged vertically): No. / Activity / Event /
-Responsible / Location / Status.
+Row-header labels are literal text in `A4:H6` (merged vertically): No. / Activity / Event /
+Responsible / Department / Location / Status / Tracker / Comments / Notes.
 
 Row header body, row 7 filled down — every cell is guarded on the activity name being non-empty:
 
 ```
-A7 = IF('L3 input'!E7<>"",'L3 input'!D7,"")     ' No.
-B7 = IF('L3 input'!E7<>"",'L3 input'!E7,"")     ' Activity
-C7 = IF('L3 input'!E7<>"",'L3 input'!F7,"")     ' Responsible
-D7 = IF('L3 input'!E7<>"",'L3 input'!H7,"")     ' Location
-E7 = IF('L3 input'!E7<>"",'L3 input'!N7,"")     ' Status
+A7 = IF('L3 input'!E8<>"",'L3 input'!D8,"")     ' No.
+B7 = IF('L3 input'!E8<>"",'L3 input'!E8,"")     ' Activity
+C7 = IF('L3 input'!E8<>"",'L3 input'!F8,"")     ' Responsible
+D7 = IF('L3 input'!E8<>"",'L3 input'!H8,"")     ' Location
+E7 = IF('L3 input'!E8<>"",'L3 input'!M8,"")     ' Status  (was N; Status/Tracker swapped)
+
+' The time plan sheet keeps its header at rows 1-6 and its data at rows 7-206, while the input
+' sheet's data starts at row 8 (blank spacer row 6). Every reference is therefore row+1.
 ```
 
 **The week grid header — this is the clever part.** Three rows: year (4), month (5), week (6). The
@@ -786,8 +853,8 @@ first grid column seeds from the L1-style range cells on `L3 input`, then every 
 increments itself:
 
 ```
-F4 = 'L3 input'!$Q$3                            ' seed year
-F6 = 'L3 input'!$P$3                            ' seed week
+F4 = 'L3 input'!$S$3                            ' seed year  (range box moved to R..X)
+F6 = 'L3 input'!$R$3                            ' seed week
 
 G6 = IF(F6 = IF(WEEKNUM(DATE(F4,12,28),21)=53, 53, 52), 1, F6+1)
 G4 = IF(F6 = IF(WEEKNUM(DATE(F4,12,28),21)=53, 53, 52), F4+1, F4)
@@ -800,7 +867,7 @@ falls in the last ISO week. So the week counter rolls over to 1 and the year cou
 week 52 or 53 as appropriate. The month label is approximated as "the month containing the Monday
 `(week-1)*7` days after 1 January", which is what the dashboard's `monthAbbrev()` reproduces.
 
-**Bars are conditional formatting, not cell content.** The grid cells `F7:LR106` are empty.
+**Bars are conditional formatting, not cell content.** The grid cells `F7:LR206` are empty.
 *Superseded:* the fifty `MOD(ROW()-7,50)` rules described here were replaced by six colour-name
 rules per block when the colour column became a dropdown — see *Activity colour is an Excel
 dropdown* at the end of this file. The original construction was fifty `x14:cfRule` expression
@@ -819,30 +886,31 @@ encoded-week range test described in §2.3.
 
 Header-row decoration rules on `F4:LR6`:
 
-- `(F$4*100+F$6) > ('L3 input'!$S$3*100+'L3 input'!$R$3)` → grey out columns past the plan end.
-- `MOD(F$4-'L3 input'!$Q$3,6)=0` … `=5` → six alternating year-band colours, so consecutive years are
+- `(F$4*100+F$6) > ('L3 input'!$U$3*100+'L3 input'!$T$3)` → grey out columns past the plan end.
+- `MOD(F$4-'L3 input'!$S$3,6)=0` … `=5` → six alternating year-band colours, so consecutive years are
   visually distinguishable.
 - `MOD(F$6-1,13)=0` (standard `dxfId=54` rule) → quarter-boundary emphasis every 13 weeks.
 
-Today marker: `AND(F$4='L3 input'!$V$3, F$6='L3 input'!$U$3)` applied separately to `F4:LR4` (thick
-red top/left/right border), `F5:LR105` (red side borders) and `F106:LR106` (closing bottom border) —
+Today marker: `AND(F$4='L3 input'!$X$3, F$6='L3 input'!$W$3)` applied separately to `F4:LR4` (thick
+red top/left/right border), `F5:LR205` (red side borders) and `F206:LR206` (closing bottom border) —
 three ranges so the marker draws as one continuous vertical box around the current week.
 
-Body greyout: the same "past plan end" rule is repeated on `F7:LR106`.
+Body greyout: the same "past plan end" rule is repeated on `F7:LR206`.
 
 ### 2.6 `master time plan` (sheet8)
 
-Same construction, one level deeper. Frozen pane at `G7` (`xSplit=6`). Columns A–F are the row
-header (A = Level, B = No., C = Activity, D = Responsible, E = Location, F = Status), G onwards is the
-week grid to column `LS`.
+Same construction, one level deeper. Frozen pane at `J7` (`xSplit=9`). Columns A–I are the row
+header (A = Level, B = No., C = Activity, D = Responsible, E = Department, F = Location, G = Status,
+H = Tracker, I = Comments / Notes), J onwards is the week grid to column `LS`. The week-window box
+stays at `LV..LY` (rows 1, 3, 4, 5), just right of the grid.
 
 Rows are allocated in five fixed blocks of 100:
 
 | Rows | Level | `A` column (merged over the whole block) |
 |---|---|---|
-| 7–106 | L1 | `A7:A106` = "L1" |
-| 107–206 | L2 | `A107:A206` = "L2" |
-| 207–306 | L3 | `A207:A306` |
+| 7–206 | L1 | `A7:A206` = "L1" |
+| 207–406 | L2 | `A207:A406` = "L2" |
+| 407–606 | L3 | `A407:A606` |
 | 307–406 | L4 | `A307:A406` |
 | 407–506 | L5 | `A407:A506` |
 
@@ -873,9 +941,14 @@ never drift apart. Change the window in `L1 input`, never in `LV3:LY3`.
 
 ### 2.7 Sheet protection
 
-Both time-plan sheets carry `<sheetProtection sheet="1" password="DC2F" …>`. This is Excel's legacy
-16-bit hash — trivially removable and intended only to stop accidental typing, not as security. The
-input sheets are unprotected.
+**Nothing in the pack is protected any more (2026-08-18).** Every `<sheetProtection>` element was
+removed from every time-plan sheet in all thirteen workbooks, on request.
+
+Historical note: they used to carry `<sheetProtection sheet="1" password="DC2F" …>`. `DC2F` is not
+the password — it is Excel's legacy 16-bit *hash* of it, which is all an .xlsx ever stores, so the
+original text is not recoverable from the file (and thousands of strings hash to it). Removing the
+element is the only real way to unlock such a sheet, which is what was done. If protection is ever
+wanted again, add it back per sheet with `buildTimePlanSheet`; do not rely on it as security.
 
 ---
 
@@ -1141,9 +1214,9 @@ DC props (`data-props`, surfaced as the host Tweaks panel):
 ## 7. Accepted limitations (not bugs)
 
 - PDF export is a single landscape Letter page; rescale at print time for very large plans.
-- Row scan caps at row 2000 with the 80-blank-row heuristic. The shipped .xlsx files are only
-  formula-filled to row 106 (100 activities) — past that the Excel side needs the last row copied
-  down; the dashboard is unaffected and warns (`TEMPLATE_ROWS`).
+- Row scan caps at row 2000 with the 80-blank-row heuristic. The shipped .xlsx files are
+  formula-filled to input row 207 (200 activities) — past that the Excel side needs the last row
+  copied down; the dashboard is unaffected and warns (`TEMPLATE_ROWS`).
 - Duplicate activity names within one level make name-based dependency references ambiguous; the
   first match wins.
 - Status strings are constrained by Excel data validation, so the dashboard doesn't validate them.
@@ -1277,6 +1350,8 @@ headed **Problems**.
 
 | Found | Defect | Fix |
 |---|---|---|
+| 2026-08-21 | The filter affordance was a bare `▽`/`▼` triangle that smudged into the header text, and neither the filter capability nor column resizing had any visible cue. | Filter control is now a bordered chip holding a funnel SVG (`fill:currentColor` → white chip / grey funnel at rest, grey chip when open, solid dark when a filter is set), positioned clear of the label with a focus-ring hover. Each resizable header edge gained a persistent 2px grip tick (`style-before`) plus a hover tint (`style-hover`) and an updated "double-click to fit to widest cell" tooltip, so both resize and filter are discoverable. |
+| 2026-08-20 | No way to narrow the master plan by the categorical columns — a reviewer wanting "just Bodyshop Engineering, only the Incomplete rows" had to read past everything else. | **Excel-style column filters** on the master plan headers for Responsible, Department, Location, Status and Tracker. Each header carries a funnel button (`▽` inert, filled `▼` when a filter is set) opening a dropdown of the column's distinct values (with counts + a search box + "(Select all)"); unchecking a value hides matching rows. Filters are stored as a map of **excluded** values per column (`state.colFilters`), so untouched and newly-appearing values stay visible — the Excel default. `passesColFilters(act)` (using `getEffectiveDates` + `trackerFor`, so a pending date edit re-buckets Tracker live) is applied wherever activities are enumerated for display: the on-screen `sections`, the SVG/PNG/PDF export `sections` + `drawPlanIdsE`, and both `isCodeVisible` closures (so dependency arrows never point at a filtered-out row). Every visible timeplan is filtered by the same set, so the whole stacked board reflows together. Persisted in the session record under `colFilters` (bucket "filters" in `sessionDirtyParts`); reset on load / Reset view / unload. Per-plan tabs and printed status sheets are deliberately left unfiltered (they always show every column). Tracker/blank values normalise via `normFilterVal` → `(Blank)`. |
 | 2026-08 | Dashboard read the Timeplan Name from `E5`; the workbook had no such field (row 5 blank, unlabelled, unmerged). Boxes always empty, typed names never persisted. | Added the `Timeplan Name` row (`B5` label, `E5:N5` value, merged) to all five input sheets; added `detectPlanNameRef` and Excel write-back. |
 | 2026-08 | Checkbox and text input shared one `<label>`, making the label's implicit control ambiguous. | Split into a `<div>` with the checkbox in its own `<label>`. |
 | 2026-08 | `computeDefaultRange` preferred `L1 input!P3:S3` over the data, so the shipped workbook opened on four years of empty grid. | Global min/max across L1–L5 is now primary; `P3:S3` is the fallback. |
@@ -1772,3 +1847,139 @@ replaced everyone else's milestones, markers, heading, ticks and week window.
   notes. The existing reference and dated log are unchanged as Part B.
 
 No change to parsing, rendering, write-back, baselines, risks or exports.
+
+## Six columns on the time plan sheets (2026-08-20)
+
+The time plan (Gantt) sheets used to show five of the input columns. They now show every text
+column the input sheet holds, in input order, so an owner can read or print a plan without
+switching sheets and can hide whatever they do not need.
+
+Row header, all twelve timeplans, all five templates and the master workbook's `L3 time plan`:
+
+| Col | Content | Input column |
+|---|---|---|
+| A | No. | D |
+| B | Activity / Event | E |
+| C | Responsible | F |
+| D | Department | G |
+| E | Location | H |
+| F | Status | M |
+| G | Tracker | N |
+| H | Comments / Notes | O |
+
+Every cell is the same guarded lookup as before — `IF('Lx input'!E{r+1}<>"", 'Lx input'!{src}{r+1}, "")`
+— so a row stays blank until its activity is named. Nothing is typed on this sheet; hide columns,
+do not delete them.
+
+**The week grid start moved F → I (`xSplit=8`, `topLeftCell="I7"`), right edge unchanged at `LR`**
+(322 weeks, was 325). Everything anchored to the grid moved with it: the year/month/week header
+chain in rows 4–6, the 13-week divider rule, and all six x14 bar rules plus the past-window and
+today-column rules (`I$4`/`I$6`, `sqref` `I…:LR…`). The stacked `master time plan` sheet moved
+G → J (`xSplit=9`) and keeps its right edge at `LS`, because the week-window box sits at `LV..LY`
+immediately after it.
+
+**Status and Tracker keep their colours.** The status conditional formatting follows the column to
+`F7:F206` (`G7:G1006` on the master sheet) and the tracker rules — Incomplete / Due this week /
+Done / Closed / On Track — are now applied on the time plan sheet too (`G7:G206`, `H7:H1006`),
+using the same dxfs as the input sheet.
+
+**One grey everywhere.** The row-header cells used fill 42 (`EBECEE`) flat, while the week grid
+alternated fill 43 (`E6E6E6`) and fill 6 (white) — two greys, visibly out of step across the
+freeze line. Six new cellXfs (ids 187–192: No. centred, text left, text centred × two bands, font
+52/53, border 13) put the row header on the *same* alternating pair as the grid, which is also the
+pair the input sheet's rows use. Grey is now `E6E6E6` on every odd row of every sheet.
+
+Column widths: No. 3.71, Activity 51.14, Responsible/Department/Location/Status 14, Tracker 12,
+Comments 30, week columns 4.43. The master sheet's week columns were left at the default 8.71 and
+are now 4.43 like the rest.
+
+The dashboard is untouched: it reads the input sheets only (`/input/i` in `parseWorkbookFile`),
+so nothing in the HTML app depends on the Gantt sheet's geometry.
+
+The transform lives in `tools/add_cols.js` (`addColsTimePlan`, `addColsMaster`, `patchStyles`) and
+is idempotent — it detects an already-migrated sheet by its grid start column and skips it.
+
+## Comments column in the dashboard (2026-08-20)
+
+The Excel Comments / Notes column (input `O`) is now a dashboard column, the last of the left-hand
+table, after Tracker.
+
+- Parsed already (`activities[].comments`); now surfaced.
+- **Master grid**: header `leftHdrCommentsStyle`, body `act.commentsStyle` — 11px, left aligned,
+  `#767267`, single line with ellipsis and the full text in the cell's `title`. Tracker only draws
+  its right divider when Comments is visible, the same rule every other column follows.
+- **View ▸ Columns** gains a Comments checkbox (`columnVisible.comments`, `toggleColumn('comments')`).
+  Read with `!== false` everywhere, so a settings file saved before today still shows the column.
+  Added to the three `columnVisible` defaults (initial state, session restore, Reset view).
+- **Width** from `computeAutoColumnWidths`: measured like the others but clamped 90–260px, because
+  comments are free prose; fallback 180.
+- **SVG / PNG / PDF export**: `cols[8]`, header `Comments`, left-aligned text truncated at 34
+  characters.
+- **Timeplan tabs** show it unconditionally (`commentsCellStyle`, 200px, ellipsised) — that table
+  always shows every column, as stated in the Columns panel.
+- Not added to the A4 status sheets: those pages are already full at eleven columns.
+
+Nothing is editable here — Comments is typed in Excel, like every other text column.
+
+**Package layout**: `Time_Plan_L1-L5_Master.xlsx` moved from the pack root into `02_Templates/`.
+
+
+## Master sheet alternating bands fixed (2026-08-20)
+
+The stacked `master time plan` sheet in both master workbooks (root and
+`02_Templates/Time_Plan_L1-L5_Master.xlsx`) was rendering **every data row grey** (fill 43) — the
+alternating grey/white banding that every input and single-plan time-plan sheet has was missing.
+
+Root cause: `buildMasterTimePlanSheet` (`tools/xlsxkit.js`) only ever picked two styles per
+200-row block — one for the block's first row, one for *all* the rest — so rows 8–206 of each block
+inherited a single grey style, and the later `addColsMaster` migration faithfully preserved that
+uniform grey. Neither step alternated by row parity the way `dataRow`/`tpDataRow` do
+(`i % 2 === 0 ? 'A' : 'B'`).
+
+Fix: a one-off repair reassigns every data cell (rows 7–1006, columns B onward; the coloured level
+gutter in A is untouched) to the correct band style, using the same style pair the single-plan
+sheets already use — grey band = 187/189/191 + grid 81, white band = 188/190/192 + grid 77 — with
+`band A (grey)` on `(row-7)` even. Result: 500 grey / 500 white rows, each level block starting
+grey, all IF() formulas untouched. All 15 workbooks re-audited clean (tag balance, cellXfs/dxfs/
+mergeCells counts, style-id range, no sheetProtection) and the standalone dashboard verified
+end-to-end (6 plans / 76 activities).
+
+Note: the generator functions were left as-is (they predate the six-column migration and are no
+longer in the build path); if a master workbook is ever rebuilt from scratch, port this banding
+repair into the rebuild.
+
+## Column widths: drag-to-resize + double-click autofit (2026-08-20)
+
+The master-plan left table gained Excel-style manual column sizing, on top of the existing
+automatic fit.
+
+- **Drag** any column's right edge (No, Activity, Responsible, Department, Location, Status,
+  Tracker, Comments) to set its width. Handles are 8px `col-resize` overlays absolutely
+  positioned on each header cell's right edge, so the header/row pixel alignment is untouched;
+  a hidden column shows no handle.
+- **Double-click** an edge to auto-fit that column to its widest cell (`autofitWidth` +
+  `COL_FIT`, the same text measurement as `computeAutoColumnWidths` but with generous caps so
+  long text fully fits instead of ellipsising).
+- **View ▸ Columns ▸ Reset column widths** clears all manual widths back to automatic.
+- Widths live in `state.colWidths` (`{colKey: px}`), merged over the auto widths by `pickW` in
+  `renderVals`; `buildExportSVG` applies the same overrides so SVG/PNG/PDF exports match the
+  screen. Persisted in the saved view (`sessionRecord`/`applyRecord`, in the `columns` dirty
+  bucket alongside `columnVisible`) so they survive reload and Save Dashboard.
+- Methods: `startColResize(key,startW)`, `autofitCol(key)`, `resetColWidths()`.
+
+Note the earlier auto-fit was not broken — it measured each column to its longest cell but
+clamped the maximum, which is why long entries still truncated. The clamps remain the default;
+drag or double-click now overrides them per column.
+
+Rebuilt: `Time Plan Dashboard (Standalone).html` re-inlined from the DC and copied to
+`dist/05_Master_Time_Plan_Dashboard/Time Plan Dashboard.html`.
+
+## Left-align Responsible / Department / Location (2026-08-20)
+
+Responsible, Department and Location now render left-aligned (header and cells) on the master
+plan and in the SVG/PNG/PDF export, matching Activity and Comments; Status and Tracker stay
+centred. On-screen: `responsibleStyle`/`departmentStyle`/`locationStyle` use
+`justifyContent:flex-start` + `textAlign:left`, and `leftHdr{Responsible,Department,Location,
+Comments}Style` add `textAlign:left` + `paddingLeft:8px`. Export (`buildExportSVG`): the header
+`centered` test is now `i===1||i===6||i===7` (No/Status/Tracker only) and the three text columns
+draw at `x=cx+6` with `text-anchor="start"`. The A4 status sheets were already left-aligned.
