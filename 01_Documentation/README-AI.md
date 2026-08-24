@@ -1983,3 +1983,25 @@ centred. On-screen: `responsibleStyle`/`departmentStyle`/`locationStyle` use
 Comments}Style` add `textAlign:left` + `paddingLeft:8px`. Export (`buildExportSVG`): the header
 `centered` test is now `i===1||i===6||i===7` (No/Status/Tracker only) and the three text columns
 draw at `x=cx+6` with `text-anchor="start"`. The A4 status sheets were already left-aligned.
+
+## Export text respects column width (2026-08-24)
+
+**Bug:** the SVG/PNG/PDF export cut Activity at a fixed 42 chars, Responsible/Department/Location
+at 18 and Comments at 34, regardless of the column's width. So a manually widened (or even a
+default auto-sized) column still showed only the truncated text — the rest was clipped even though
+the column had room. Reported as "the export only shows the non-expanded column's content and the
+other text is cut out."
+
+**Fix:** new `fitTextToWidth(str, maxPx, font)` helper (next to `measureMax`) truncates with an
+ellipsis using canvas `measureText` against the *actual* drawn width and font, returning the whole
+string when it fits. `buildExportSVG` now calls it for Activity (`cols[2].w-12`, 10px), the three
+text columns (`colw-12`, 9px) and Comments (`cols[8].w-12`, 9px) instead of `.slice(0,N)`. Fixes
+all three export formats at once (PNG and PDF both render from the same SVG). Hidden columns
+(`w===0`) and columns too narrow for an ellipsis both yield an empty string, so nothing overflows.
+Standalone re-inlined and copied to `dist/05_Master_Time_Plan_Dashboard/Time Plan Dashboard.html`.
+
+**Audit, 2026-08-24:** all 13 workbooks (root master, dist master, 5 templates, 6 demo timeplans)
+re-checked programmatically — parts present, `[Content_Types]` covers every part, no
+`sheetProtection`, no `wrapText`, XML tag balance clean. `plans.json` lists exactly the six files
+present plus the one baseline. Dashboard loads the demo set end-to-end (6 plans / 76 activities /
+0 unresolved dependencies) with no console errors.
