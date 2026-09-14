@@ -579,7 +579,7 @@ caps at 200.
 | File | Role |
 |---|---|
 | `dist/03_Time_Plans/L*.xlsx` | The 6 demo timeplans (1×L1, 1×L2, 1×L3, 2×L4, 1×L5), each two sheets, listed in `plans.json`. |
-| `Time_Plan_L1-L5_Master.xlsx` | The original single workbook (five input sheets + `L3 time plan` + `master time plan`). Migrated 2026-08-14 to the same shape as the per-plan files: Department at G, Plan ID (`L{n}_Master`) and Last updated on row 5, tracker/status/dependency refs shifted, all `master time plan` block formulas and bar rules repointed. Loads as five plans (§0.3 case 3) — but only with the `strictFileNames` prop set to `false`, because the file name does not start with `L{level}`. Shipped at the pack root as well as the project root. |
+| `Time_Plan_L1-L5_Master.xlsx` | The original single workbook (five input sheets + `L3 time plan` + `master time plan`). Migrated 2026-08-14 to the same shape as the per-plan files: Department at G, Plan ID (`L{n}_Master`) and Last updated on row 5, tracker/status/dependency refs shifted, all `master time plan` block formulas and bar rules repointed. Loads as five plans (§0.3 case 3) — but only with the `strictFileNames` prop set to `false`, because the file name does not start with `L{level}`. Shipped at the pack root as well as the project root. **Not** part of the 2026-09 Planned/Actual migration (§0.11) — it still carries a single `Colour` column and `Start/End Wk/Yr` only, on all five input sheets and both Gantt sheets. `README.md` already tells users to ignore this file; the dashboard's colour-column detection is position-based (`No.` col − 1/− 2), so on this unmigrated file the single `Colour` value resolves as `colorPlanned` and the swatch chip falls back to the row palette — cosmetic only, the Gantt bar itself still renders in the right colour. Flagged, not fixed in place: repointing its input sheets would desync the stacked `master time plan` formulas, which reference the old column letters directly. |
 | `Time Plan Dashboard.dc.html` | **Source of truth for the UI.** A Design Component: template + `class Component extends DCLogic`. Edit this. |
 | `Time Plan Dashboard (Standalone).html` | Self-contained bundle of the DC — this is what ships (copied to `dist/05_Master_Time_Plan_Dashboard/Time Plan Dashboard.html`). Regenerate after every DC change; never hand-edit. |
 | `README.md` / `README-AI.md` | User guide / this file. |
@@ -1381,6 +1381,7 @@ headed **Problems**.
 | 2026-08-14 audit | Row 5 was merged `E5:N5`, hiding the **Plan ID** and **Last updated** cells behind the Timeplan Name band — the dashboard read them, but in Excel they were invisible and untypable, while the README told owners to fill them in. | Row 5 is now three merges (`E5:F5`, `H5:I5`, `K5:N5`) in all five templates, all six timeplans and the master. |
 | 2026-08-14 audit | The duplicate-file-name check counted **plans**, not source files, so the legacy master (one file, five plans) always warned "Two loaded files are called Time_Plan_L1-L5_Master.xlsx. Rename one of them." | The check now compares `srcUid`, so several plans out of one workbook are not a clash. |
 | 2026-08-14 audit | The root master workbook still had the pre-Department layout and no Plan ID / Last updated, so it loaded on a different lettering from every other file. | Migrated in place (§1): Department inserted at G on all five input sheets, row-5 fields added, tracker formula, validations, conditional formatting, column widths, `L3 time plan` and all five `master time plan` blocks repointed. Verified by loading it into the dashboard: 5 plans × 10 activities, Department/Status/Dependencies detected at G/N/P, dependencies resolved, no warnings. |
+| 2026-09-14 audit | Doc drift: version pill section still described the `'Version 1'` label with a hover card showing publish date, author and email. | Pill relabelled `'Y26'`; hover card and its state/handlers removed — pill is now a static label. Doc corrected to match. |
 | 2026-08-14 audit | Doc drift: "12 demo timeplans" (six ship), `dist/06_Master_Time_Plan_Dashboard` (it is 05), two logo files in `01_Documentation` (one), `APP_VERSION 'Version 2.8'` (pinned to `'Version 1'`), the §2.2 column table and §2.3/§2.4/§2.5 cell references still on the pre-Department lettering, the 30-blank-row scan (80), markers "six colours" (five). | All corrected in place; §2.5's fifty `MOD(ROW())` bar rules marked superseded. |
 
 
@@ -1577,7 +1578,7 @@ current-week rect so they read on top.
 
 ### PDF page sizes and footer
 
-`Component.PDF_SIZES` — `letter` (11×8.5in), `a3` (16.54×11.69), `a2` (23.39×16.54), all
+`Component.PDF_SIZES` — `a4` (11.69×8.27in), `letter` (11×8.5in), `a3` (16.54×11.69), all
 landscape, all in inches; `css` is the `@page size` value. `onExportPDF(sizeKey)` takes the key
 (defaulting to letter) and reserves 22px at the foot of the sheet for the footer, so the artwork
 scale is computed against `availH - footH`. The Export panel renders the three as a row from
@@ -1618,14 +1619,14 @@ bands. Do not raise it above 39. (The current-week marker is deliberately differ
 
 ---
 
-## 0.13 Version pill (2026-08-08)
+## 0.13 Version pill (2026-08-08, removed 2026-09-14)
 
-`APP_VERSION` is pinned to the string `'Version 1'` and is not to be bumped. Alongside it:
-`APP_PUBLISHED` (`'13 Aug 2026'`),
-`APP_AUTHOR`, `APP_AUTHOR_EMAIL` and `APP_VERSION_TOOLTIP` (a newline-joined native `title`
-fallback). The pill in the top bar is `position:relative` and opens a hover card
-(`state.verHover`, set by `onVerEnter`/`onVerLeave`) listing version, publish date, author and
-email. `APP_VERSION` is still what the report headers print, so changing it changes both.
+The top-bar version pill (green dot + label, previously `'Version 1'` then `'Y26'`) has been
+removed from the UI entirely, along with its hover card and the now-unused
+`APP_PUBLISHED`/`APP_AUTHOR`/`APP_AUTHOR_EMAIL`/`APP_VERSION_TOOLTIP`/`state.verHover`/
+`onVerEnter`/`onVerLeave`. `APP_VERSION` (`'Y26'`) still exists as a constant and is still what
+the exported report headers print ("Produced ... from Master Time Plan Dashboard Y26") — only
+the header pill is gone.
 
 `dist/01_Documentation/` holds exactly one logo file, `logo.svg` — the duplicate copy under the
 original Volvo file name was removed. That name is the only one `LOGO_FOLDER_CANDIDATES` looks for.
@@ -1750,7 +1751,7 @@ black or white text by relative luminance. No counts in the tab labels.
 
 Cell markers now draw glyph-first with the name to the right (`flexDirection:'row'`), 26px in the
 DOM and 22px in the SVG export with a white `paint-order="stroke"` outline, at `zIndex:8` so they
-stay legible over a bar. `APP_VERSION` is pinned to "Version 1" and is not to be bumped.
+stay legible over a bar. `APP_VERSION` is pinned to "Y26" and is not to be bumped.
 
 ## Activity colour is an Excel dropdown (2026-08-13)
 

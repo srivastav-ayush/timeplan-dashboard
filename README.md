@@ -15,31 +15,39 @@ One Excel file per timeplan. One HTML dashboard that reads them all and draws a 
 ## Using it
 
 1. Copy a template out of `02_Templates` into `03_Time_Plans` and rename it `L2_MyPlan.xlsx`.
-2. Open the **input** sheet. Fill in the header block, then one activity per row from row 8.
+2. Open the **description** sheet. Fill in the header block. Then open **input** and add one
+   activity per row from row 8.
 3. Save. Open the dashboard, click **Files ▸ Load folder** and pick `03_Time_Plans`.
 
+## The description sheet
+
+The project/timeplan header block sits on its own sheet, before input: Project Name, Project
+Code, SoP, Description, **Timeplan Name**, **Timeplan ID**, **Timeplan Owner**. Last updated
+fills itself in — do not type a date there.
+
+The **Timeplan range** box sets the first and last week the Excel Gantt draws. **Today** fills
+itself in.
+
 ## The input sheet
-
-Header block (rows 2–5): Project Name, Project Code, SoP, Description, **Timeplan Name**,
-**Timeplan ID**, **Timeplan Owner**. Last updated fills itself in — do not type a date there.
-
-The **Timeplan range** box (R2:U3) sets the first and last week the Excel Gantt draws.
-**Today** (W3:X3) fills itself in.
 
 Activity table, rows 8 to 207 — 200 activities:
 
 | Column | Fill in |
 |---|---|
-| Colour | Dropdown: Red / Yellow / Green / Blue / Purple. Colours the bar. |
+| Colour (Planned) | Dropdown: Red / Yellow / Green / Blue / Purple. Colours the cell for the Planned week range. |
+| Colour (Actual) | Same dropdown. Colours the cell for the Actual week range; where Planned and Actual both cover a week, Actual wins. |
 | No. | Already numbered 1–200. Leave it. |
 | Activity / Event | The name. **A row with no name is ignored everywhere.** |
 | Responsible | Person. |
 | Department, Location | Free text. |
-| Start Wk / Yr, End Wk / Yr | ISO week numbers and years. |
+| Planned Start Wk / Yr, Planned End Wk / Yr | ISO week numbers and years — the schedule. Drives the Tracker and dependency checks. |
+| Actual Start Wk / Yr, Actual End Wk / Yr | ISO week numbers and years — when the work really happened. Leave blank until it starts/finishes; the dashboard falls back to showing Planned alone. |
 | Status | Dropdown, 14 values. The one thing you choose. |
-| Tracker | **Formula — do not type in it.** |
+| Tracker | **Formula — do not type in it.** Based on the Planned end date. |
 | Comments / Notes | Free text. |
 | Dependencies | `L1_Programme-14; L3_Tooling-7` — see below. |
+
+On the time plan sheet's Gantt, and in the HTML dashboard, the Actual bar is the solid full-height bar; the Planned bar is a thinner stripe drawn on top of it, so a gap between the two shows exactly how far the real work drifted from schedule.
 
 ### Status
 
@@ -76,7 +84,7 @@ the Tracker and the dashboard — silently.
 - **Do not rename the sheets.** `L3 input` and `L3 time plan` are found by name.
 - **Do not rename a file once its ID is in use** — every dependency pointing at it stops working.
 - **Do not type in the Tracker column, or anywhere on the time plan sheet.** Both are formulas.
-- **Do not touch the Timeplan range box or the Today box** beyond the four range numbers.
+- **Do not touch the Timeplan range box or the Today box** (on the description sheet) beyond the four range numbers.
 - **Do not use Sort.** It moves values out from under the formulas. Reorder by retyping.
 - Only fill rows 8–207. Past row 207 the dropdowns and the Tracker formula stop.
 - One file per timeplan, named `L{1-9}_Name.xlsx`, all in the same folder, no sub-folders.
